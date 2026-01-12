@@ -1,6 +1,6 @@
 // Application imports:
 import { useAuthStore } from "../../../../stores/authStore";
-import { RkLogo } from "../../../../assets/logo/RkLogo";
+import { PageLogo } from "../../../../assets/icons/PageLogo";
 import { useNavigate, NavLink } from "react-router-dom";
 import { login } from "../../api/authApi";
 import { useState } from "react";
@@ -62,11 +62,11 @@ export function LoginPage() {
   }
 
   return (
-    <Container size={420} my={60}>
+    <Container size={420}>
       {/* Logo */}
-      <Center mb="md">
+      <Center>
         <NavLink to="/" aria-label="AlpenWegs Homepage">
-          <RkLogo />
+          <PageLogo size={200} />
         </NavLink>
       </Center>
 

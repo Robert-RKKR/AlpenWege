@@ -1,45 +1,51 @@
 // Imports:
-import { IconBrandInstagram, IconBrandTwitter, IconBrandYoutube } from '@tabler/icons-react';
+import { pageFooterNavigationLinks, pageFooterSocialLinks } from "./pageFooterData";
 import { ActionIcon, Anchor, Group, Box, Center } from '@mantine/core';
-import classes from "./PageFooter.module.css";
 
-const links = [
-  { link: '#', label: 'Contact' },
-  { link: '#', label: 'Privacy' },
-  { link: '#', label: 'Blog' },
-  { link: '#', label: 'Store' },
-  { link: '#', label: 'Careers' },
-];
-
+// Page footer component:
 export function PageFooter() {
-  const items = links.map((link) => (
-    <Anchor c="dimmed" key={link.label} href={link.link} lh={1} onClick={(event) => event.preventDefault()} size="sm">
-      {link.label}
+
+  // Generate navigation links items:
+  const navigationItems = pageFooterNavigationLinks.map((item) => (
+    <Anchor
+      key={item.label}
+      href={item.href}
+      size="sm"
+      lh={1}
+      c="dimmed"
+    >
+      {item.label}
     </Anchor>
   ));
 
+  // Generate social links items:
+  const socialItems = pageFooterSocialLinks.map((item) => (
+    <ActionIcon
+      key={item.label}
+      component="a"
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      size={22}
+      variant="subtle"
+      radius="xl"
+      aria-label={item.label}
+    >
+      <item.icon size={14} />
+    </ActionIcon>
+  ));
+
   return (
-    <Box h={40} px="sm" className={classes.footer}>
+    <Box h={40} px="sm">
       <Center h="100%">
         <Group gap="md">
-          
-          {/* Text links */}
-          <Group gap="sm">
-            { items}
-          </Group>
 
-          {/* Social icons */}
-          <Group gap={4}>
-            <ActionIcon size={22} variant="subtle" radius="xl">
-              <IconBrandTwitter size={14} />
-            </ActionIcon>
-            <ActionIcon size={22} variant="subtle" radius="xl">
-              <IconBrandYoutube size={14} />
-            </ActionIcon>
-            <ActionIcon size={22} variant="subtle" radius="xl">
-              <IconBrandInstagram size={14} />
-            </ActionIcon>
-          </Group>
+          {/* Navigation links */}
+          <Group gap="sm">{navigationItems}</Group>
+
+          {/* Social links */}
+          <Group gap={4}>{socialItems}</Group>
+
         </Group>
       </Center>
     </Box>

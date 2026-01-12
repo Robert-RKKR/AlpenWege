@@ -1,62 +1,72 @@
-//  Imports:
-import { Anchor, Box, Burger, Button, Center, Collapse, Divider,
-  Drawer, Group, HoverCard, ScrollArea, SimpleGrid, Text, ThemeIcon,
-  UnstyledButton, useMantineTheme } from "@mantine/core";
-import { NavLink } from "react-router-dom";
+// Imports
+import type { DropdownProps } from "./PageHeaderDropdownProps";
 import classes from "./PageHeader.module.css";
+import { NavLink } from "react-router-dom";
+import {
+  useMantineTheme,
+  UnstyledButton,
+  SimpleGrid,
+  ThemeIcon,
+  Divider,
+  Button,
+  Anchor,
+  Group,
+  Text,
+} from "@mantine/core";
 
-// Types (optional but recommended)
-export type DropdownConfig = {
-  label: string;
-  viewAll: {
-    label: string;
-    to: string;
-  };
-  items: {
-    icon: any;
-    title: string;
-    description: string;
-    to: string;
-  }[];
-  footer: {
-    title: string;
-    description: string;
-    button: {
-      label: string;
-      to: string;
-    };
-  };
-};
-
-type Props = {
-  config: DropdownConfig;
-  onItemClick?: () => void;
-  mobile?: boolean;
-};
-
-export function PageHeaderDropdown({ config, onItemClick, mobile }: Props) {
-
-  // Style theme:
+// Dropdown component:
+export function PageHeaderDropdown({
+  config,
+  onItemClick,
+  mobile,
+}: DropdownProps) {
+  
+  { /* Mantine theme access for consistent colors and spacing */ }
   const theme = useMantineTheme();
 
   return (
     <>
+      { /* Header section: dropdown label and "view all" link */ }
       <Group justify="space-between" px={mobile ? "md" : undefined}>
-        <Text fw={500} fz={mobile ? "md" : "sm"}>{config.label}</Text>
-        <Anchor component={NavLink} to={config.viewAll.to} fz="xs">
+        <Text fw={500} fz={mobile ? "md" : "sm"}>
+          {config.label}
+        </Text>
+
+        <Anchor
+          component={NavLink}
+          to={config.viewAll.to}
+          fz="xs"
+        >
           {config.viewAll.label}
         </Anchor>
       </Group>
 
+      { /* Visual separation between header and items */ }
       <Divider my="sm" />
 
+      { /* Grid of dropdown navigation items */ }
       <SimpleGrid cols={2} spacing={0}>
         {config.items.map((item) => (
-          <UnstyledButton key={item.title} className={classes.subLink} component={NavLink} to={item.to} onClick={onItemClick}>
-            <Group wrap="nowrap" align="flex-start" m={mobile ? "md" : undefined}>
+          <UnstyledButton
+            key={item.title}
+            className={classes.pageHeaderSubLink}
+            component={NavLink}
+            to={item.to}
+            onClick={onItemClick}
+          >
+            { /* Single dropdown item with icon and text */ }
+            <Group
+              wrap="nowrap"
+              align="flex-start"
+              m={mobile ? "md" : undefined}
+            >
               <ThemeIcon size={34} variant="default" radius="md">
-                <item.icon size={22} color={theme.colors.blue[6]} />
+                <item.icon
+                  size={22}
+                  color={theme.colors.blue[6]}
+                />
               </ThemeIcon>
+
               <div>
                 <Text size={mobile ? "md" : "sm"} fw={500}>
                   {item.title}
@@ -70,6 +80,7 @@ export function PageHeaderDropdown({ config, onItemClick, mobile }: Props) {
         ))}
       </SimpleGrid>
 
+      { /* Footer section with description and call-to-action */ }
       <div className={classes.dropdownFooter}>
         <Group justify="space-between">
           <div>
@@ -80,7 +91,14 @@ export function PageHeaderDropdown({ config, onItemClick, mobile }: Props) {
               {config.footer.description}
             </Text>
           </div>
-          <Button variant="default" component={NavLink} to={config.footer.button.to}>
+
+          <Button
+            variant="default"
+            component={NavLink}
+            onClick={onItemClick}
+            className={classes.pageHeaderSubLink}
+            to={config.footer.button.to}
+          >
             {config.footer.button.label}
           </Button>
         </Group>

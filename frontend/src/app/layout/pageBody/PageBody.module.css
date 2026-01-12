@@ -1,17 +1,19 @@
-.scroll {
-  height: 100%;
-}
-
-.body {
+.pageBody {
   width: 80%;
   height: 100%;
   margin: 0 auto;
 }
 
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .pageBody {
+    width: 95%;
+  }
+}
 
-/* Mobile */
+/* Mobile styles */
 @media (max-width: 768px) {
-  .body {
+  .pageBody {
     width: 100%;
     padding-left: var(--mantine-spacing-sm);
     padding-right: var(--mantine-spacing-sm);

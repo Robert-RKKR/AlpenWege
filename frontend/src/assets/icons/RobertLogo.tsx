@@ -1,14 +1,20 @@
 type LogoProps = {
-  className?: string;
+  size?: number | string;
+  color?: string;
 };
 
-export function RkLogo({ className }: LogoProps) {
+export function RobertLogo({
+  size = 20,
+  color = "#ffffff",
+}: LogoProps) {
   return (
     <svg
       aria-hidden="true"
       viewBox="290.711 59.31 520.826 380.969"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      width={size}
+      height={size}
+      fill={color}
     >
       <g transform="matrix(0.1, 0, 0, -0.1, 351.266912, 356.636907)">
         <path d="M -127.046 2902.054 C -100.862 2871.506 1110.15 1265.506 1110.15 1265.506 C 1110.15 1265.506 -527.963 -771.002 -551.297 -771.036 C -574.632 -771.071 -12.846 -771.15 89.088 -771.29 C 89.088 -771.29 1366.709 911.971 1388.529 911.971 C 1405.985 911.971 1842.743 301.063 1842.743 301.063 L 1773.399 -770.584 L 2452.317 -770.606 L 2348.703 459.528 L 501.5 2903.075 C 328.228 2903.019 128.884 2903.647 -127.046 2902.054 Z" />
