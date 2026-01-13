@@ -24,23 +24,23 @@ AlpenWeg is a comprehensive outdoor adventure application that supports users in
 
 ### Compendium
 
-The AlpenWegs Compendium is a rich resource that provides users with valuable insights into the regions they explore. Covering topics such as local trails, regions, cities, historical landmarks, and Switzerland's unique flora and fauna, this database enhances users' understanding and appreciation of Swiss landscapes. By providing comprehensive information on the cultural and natural history of each location, the Compendium turns hiking into an inspirational experience, fostering a deeper connection between hikers and the places they visit.
+The AlpenWege Compendium is a rich resource that provides users with valuable insights into the regions they explore. Covering topics such as local trails, regions, cities, historical landmarks, and Switzerland's unique flora and fauna, this database enhances users' understanding and appreciation of Swiss landscapes. By providing comprehensive information on the cultural and natural history of each location, the Compendium turns hiking into an inspirational experience, fostering a deeper connection between hikers and the places they visit.
 
 ### Event Planning
 
-AlpenWegs includes a social event planning feature that allows users to organize and participate in hiking events with others. Whether planning group walks, meet-ups, or community challenges, users can connect with other enthusiasts who share similar interests. This feature promotes camaraderie and social engagement, allowing users to discover new trails together and create shared memories in the Swiss Alps.
+AlpenWege includes a social event planning feature that allows users to organize and participate in hiking events with others. Whether planning group walks, meet-ups, or community challenges, users can connect with other enthusiasts who share similar interests. This feature promotes camaraderie and social engagement, allowing users to discover new trails together and create shared memories in the Swiss Alps.
 
 ### Summary
 
-The aim of AlpenWegs is to support all stages of hiking, providing a clear and practical process from initial planning to post-hike reflection. This structure encourages organized, prepared, and informed hiking in the Swiss countryside.
+The aim of AlpenWege is to support all stages of hiking, providing a clear and practical process from initial planning to post-hike reflection. This structure encourages organized, prepared, and informed hiking in the Swiss countryside.
 
 ## Purpose and Vision
 
-The main objective of AlpenWegs is to provide a complete solution for hiking in the Swiss Alps, giving users the tools to plan their next outdoor adventure. A key feature of the application is the Hiking Cycle, which guides users through each of the essential phases of the hiking experience: Planning, Preparation, Execution, Records, and Future Goals. This structured approach supports walkers from the initial idea of a walk to post-hike reflection.
+The main objective of AlpenWege is to provide a complete solution for hiking in the Swiss Alps, giving users the tools to plan their next outdoor adventure. A key feature of the application is the Hiking Cycle, which guides users through each of the essential phases of the hiking experience: Planning, Preparation, Execution, Records, and Future Goals. This structured approach supports walkers from the initial idea of a walk to post-hike reflection.
 
 The Hiking Cycle is complemented by the Compendium, a comprehensive resource providing valuable information on local trails, Swiss regions, cities, and landmarks. This database not only enhances practical planning but also fosters a deeper connection with the Swiss landscape by sharing the unique history and natural beauty of each area.
 
-To further enrich the hiking experience, AlpenWegs also includes an events feature that allows users to create and join social gatherings related to hiking. This feature encourages community building and shared outdoor experiences, allowing users to connect with others who share their passion for exploring the Swiss Alps.
+To further enrich the hiking experience, AlpenWege also includes an events feature that allows users to create and join social gatherings related to hiking. This feature encourages community building and shared outdoor experiences, allowing users to connect with others who share their passion for exploring the Swiss Alps.
 
 ## Application Components and Models
 
