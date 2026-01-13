@@ -1,5 +1,7 @@
 # AlpenWege
 
+![Main photo](project/img/main_photo.png)
+
 ## Overview
 
 AlpenWege is a comprehensive outdoor adventure application that supports users in planning, experiencing, and documenting various mountain activities in Switzerland, including hiking, biking, trail running, and camping. The application is built around five main components:
