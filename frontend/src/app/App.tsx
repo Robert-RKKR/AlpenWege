@@ -1,16 +1,13 @@
-// Import application components:
+// Imports:
 import { startTokenRefresh } from "../modules/profiles/api/refreshApi";
-import { useAuthStore } from "../stores/authStore";
-import { AppRoutes } from "./routes";
-
-// Import React:
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Notifications } from "@mantine/notifications";
 import { queryClient } from "./providers/queryClient";
+import { useAuthStore } from "../stores/authStore";
 import { BrowserRouter } from "react-router-dom";
-import { useEffect } from "react";
-
-// Mantine imports:
 import { MantineProvider } from "@mantine/core";
+import { AppRoutes } from "./routes";
+import { useEffect } from "react";
 
 // App component:
 export function App() {
@@ -31,9 +28,15 @@ export function App() {
           defaultRadius: "md",
         }}
       >
+
+        {/* Mantine notifications */}
+        <Notifications position="top-right" />
+
+        {/* Browser router */}
         <BrowserRouter>
           <AppRoutes />
         </BrowserRouter>
+
       </MantineProvider>
     </QueryClientProvider>
   );

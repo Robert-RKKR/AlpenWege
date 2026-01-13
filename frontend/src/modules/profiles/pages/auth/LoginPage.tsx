@@ -2,79 +2,98 @@
 import { useAuthStore } from "../../../../stores/authStore";
 import { PageLogo } from "../../../../assets/icons/PageLogo";
 import { useNavigate, NavLink } from "react-router-dom";
+import { notifications } from "@mantine/notifications";
+import classes from "./LoginPage.module.css";
 import { login } from "../../api/authApi";
 import { useState } from "react";
 import axios from "axios";
 
 // Mantine:
 import {
+  PasswordInput,
+  TextInput,
+  Container,
+  Checkbox,
   Anchor,
   Button,
-  Checkbox,
-  Container,
+  Center,
+  Title,
   Group,
   Paper,
-  PasswordInput,
   Text,
-  TextInput,
-  Title,
-  Center,
   Stack,
 } from "@mantine/core";
 
-// Styles:
-import classes from "./LoginPage.module.css";
-
+// LoginPage component:
 export function LoginPage() {
+
+  // React Router navigation helper
   const navigate = useNavigate();
+
+  // Auth store action to persist user + tokens
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  // Form state:
+  // Login form states:
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
-  // UI state:
-  const [error, setError] = useState<string | null>(null);
+  // Indicates whether login request is in progress
   const [loading, setLoading] = useState(false);
 
+  // Form submission handler
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    // Prevent default browser form submission
     e.preventDefault();
-    setError(null);
+
+    // Disable submit button and show loader
     setLoading(true);
 
     try {
+      // Call login API with credentials
       const { user, access, refresh } = await login({ email, password });
+
+      // Persist authentication state (user + tokens)
       setAuth(user, access, refresh, rememberMe);
+
+      // Redirect to user profile after successful login
       navigate("/auth/profile");
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.page_error?.error_message ??
-            "Invalid email or password"
-        );
-      } else {
-        setError("Unexpected error occurred");
-      }
+      // Resolve a user-friendly error message
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.page_error?.error_message ??
+          "Invalid email or password"
+        : "Unexpected error occurred";
+
+      // Show toast-style error notification
+      notifications.show({
+        title: "Login failed",
+        message,
+        color: "red",
+        withBorder: true,
+        autoClose: 10000,
+      });
     } finally {
+      // Re-enable submit button
       setLoading(false);
     }
   }
 
   return (
     <Container size={420}>
-      {/* Logo */}
+      {/* Application logo / home link */}
       <Center>
         <NavLink to="/" aria-label="AlpenWegs Homepage">
           <PageLogo size={200} />
         </NavLink>
       </Center>
 
-      {/* Title */}
+      {/* Page title */}
       <Title ta="center" className={classes.title}>
         Welcome back
       </Title>
 
+      {/* Registration hint */}
       <Text className={classes.subtitle}>
         Do not have an account yet?{" "}
         <Anchor component={NavLink} to="/auth/register">
@@ -82,10 +101,11 @@ export function LoginPage() {
         </Anchor>
       </Text>
 
-      {/* Form card */}
+      {/* Login form container */}
       <Paper withBorder shadow="sm" p={24} mt={30} radius="md">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
+            {/* Email input */}
             <TextInput
               label="Email"
               placeholder="you@example.com"
@@ -95,8 +115,10 @@ export function LoginPage() {
               value={email}
               autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
+              className={classes.loginPageInput}
             />
 
+            {/* Password input */}
             <PasswordInput
               label="Password"
               placeholder="Your password"
@@ -105,8 +127,10 @@ export function LoginPage() {
               value={password}
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
+              className={classes.loginPageInput}
             />
 
+            {/* Remember me + forgot password */}
             <Group justify="space-between">
               <Checkbox
                 label="Keep me logged in"
@@ -119,17 +143,13 @@ export function LoginPage() {
               </Anchor>
             </Group>
 
-            {error && (
-              <Text c="red" size="sm">
-                {error}
-              </Text>
-            )}
-
+            {/* Submit button */}
             <Button
               type="submit"
               fullWidth
               radius="md"
               loading={loading}
+              disabled={loading}
             >
               Log in
             </Button>

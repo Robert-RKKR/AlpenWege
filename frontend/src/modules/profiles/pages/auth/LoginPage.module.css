@@ -9,3 +9,10 @@
   text-align: center;
   margin-top: 6px;
 }
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .loginPageInput input {
+    font-size: 17px;
+  }
+}
