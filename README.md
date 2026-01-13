@@ -2,7 +2,7 @@
 
 ## Overview
 
-AlpenWeg is a comprehensive outdoor adventure application that supports users in planning, experiencing, and documenting various mountain activities in Switzerland, including hiking, biking, trail running, and camping. The application is built around five main components:
+AlpenWege is a comprehensive outdoor adventure application that supports users in planning, experiencing, and documenting various mountain activities in Switzerland, including hiking, biking, trail running, and camping. The application is built around five main components:
 
 - **Profiles** – Manages user accounts, roles, settings, and personal achievements.
 - **Assets** – Handles storage and organization of files such as images, GPX tracks, and documents.
@@ -12,13 +12,13 @@ AlpenWeg is a comprehensive outdoor adventure application that supports users in
 
 ### Activity Cycle:
 
-- **Planning** – Users can plan both single-day and multi-day adventures for various outdoor activities. In AlpenWeg, a trail represents the intended path between two geographic points (a starting point and an ending point of trip). A route is an actual instance of a trail completed by a user. Multiple trails and routes that share the same origin and endpoint form a path, allowing users to choose alternative options based on difficulty, scenery, or terrain type. This flexible structure allows each user to customize their journey according to their preferences and capabilities.
+- **Planning** – Users can plan both single-day and multi-day adventures for various outdoor activities. In AlpenWege, a trail represents the intended path between two geographic points (a starting point and an ending point of trip). A route is an actual instance of a trail completed by a user. Multiple trails and routes that share the same origin and endpoint form a path, allowing users to choose alternative options based on difficulty, scenery, or terrain type. This flexible structure allows each user to customize their journey according to their preferences and capabilities.
 
 - **Preparation** – The app provides essential preparation tools, including integration with SBB timetables to recommend optimal transport options to the starting point. Real-time weather data from Swiss Meteo helps users equip themselves appropriately for current and forecasted conditions, improving safety and comfort.
 
 - **Execution** – During the activity, users can rely on the app as a real-time navigation guide, following the planned trail while recording progress. The interface provides geolocation tracking, checkpoints, and status indicators to stay aligned with the planned route.
 
-- **Recording** – Once an activity is completed, users can log it as a personalized entry in their adventure journal. These entries may include GPX tracks, photos, notes, and tags such as “favorite trail,” “best views,” or “most challenging section.” AlpenWeg also aggregates statistics like total distance, elevation gain, and time, while placing strong emphasis on the personal narrative of each journey.
+- **Recording** – Once an activity is completed, users can log it as a personalized entry in their adventure journal. These entries may include GPX tracks, photos, notes, and tags such as “favorite trail,” “best views,” or “most challenging section.” AlpenWege also aggregates statistics like total distance, elevation gain, and time, while placing strong emphasis on the personal narrative of each journey.
 
 - **Memories** – Users can set seasonal goals—such as total distance, elevation gain, or number of completed trails—and visually track their progress over time. Progress bars, milestone markers, and completion indicators keep users motivated and aware of their journey's arc. As each activity is logged, the app updates goal progress in real time, creating a clear path toward personal achievement and long-term motivation.
 
@@ -114,9 +114,9 @@ Tracks and awards users for completing specific actions or milestones, such as c
 - **Models**:
     - **`AchievementModel`**: Defines an achievement, including criteria for unlocking, category (e.g., effort-based, region-based), and visual representation.
 
-# AlpenWeg Django Application Stack
+# AlpenWege Django Application Stack
 
-This document outlines the selected technology stack for the AlpenWeg project, focused on maintainability, performance, and usability.
+This document outlines the selected technology stack for the AlpenWege project, focused on maintainability, performance, and usability.
 
 ## 🔐 Authentication
 
