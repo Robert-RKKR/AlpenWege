@@ -1,84 +1,23 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgis/postgis:16-3.4
-    container_name: alpenwegs-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-alpenwegs}
-      POSTGRES_USER: ${DB_USER:-alpenuser}
-      POSTGRES_PASSWORD: ${DB_PASS:-alpenpass}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - alpenwegs
 
   redis:
     image: redis:7-alpine
-    container_name: alpenwegs-redis
+    networks:
+      - alpenwegs
 
-  backend:
-    build: ./backend
-    container_name: alpenwegs-backend
-    environment:
-      DEBUG: ${DEBUG:-1}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
-      SECRET_KEY: ${SECRET_KEY:-django-insecure-docker}
-
-      DB_NAME: ${DB_NAME:-alpenwegs}
-      DB_USER: ${DB_USER:-alpenuser}
-      DB_PASS: ${DB_PASS:-alpenpass}
-      DB_HOST: ${DB_HOST:-postgres}
-      DB_PORT: ${DB_PORT:-5432}
-
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-    command: >
-      sh -c "
-      python manage.py migrate &&
-      python manage.py application_initiation &&
-      python manage.py collectstatic --noinput &&
-      python manage.py runserver 0.0.0.0:8000
-      "
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "8001:8000"
-
-  celery:
-    build: ./backend
-    container_name: alpenwegs-celery
-    environment:
-      DEBUG: ${DEBUG:-1}
-
-      DB_NAME: ${DB_NAME:-alpenwegs}
-      DB_USER: ${DB_USER:-alpenuser}
-      DB_PASS: ${DB_PASS:-alpenpass}
-      DB_HOST: ${DB_HOST:-postgres}
-      DB_PORT: ${DB_PORT:-5432}
-
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-    command: celery -A alpenwegs worker -Q process_model_tasks --hostname=process_model_tasks@%h -l INFO
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - backend
-      - redis
-      - postgres
-
-  frontend:
-    build: ./frontend
-    container_name: alpenwegs-frontend
-    environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8001}
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - backend
+networks:
+  alpenwegs:
 
 volumes:
   postgres_data:
+  staticfiles:

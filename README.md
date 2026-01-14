@@ -2,6 +2,35 @@
 
 ![Main photo](project/img/main_photo.png)
 
+Standard dev run (foreground)
+docker compose \
+  --env-file .env.dev \
+  -f docker-compose.yml \
+  -f docker-compose.dev.yml \
+  up --build
+
+Dev run in background (recommended)
+docker compose \
+  --env-file .env.dev \
+  -f docker-compose.yml \
+  -f docker-compose.dev.yml \
+  up --build -d
+
+
+How to stop DEV stack
+docker compose \
+  --env-file .env.dev \
+  -f docker-compose.yml \
+  -f docker-compose.dev.yml \
+  down
+
+How to fully reset DEV (volumes + images)
+docker compose \
+  --env-file .env.dev \
+  -f docker-compose.yml \
+  -f docker-compose.dev.yml \
+  down -v --remove-orphans
+  
 ## Overview
 
 AlpenWege is a comprehensive outdoor adventure application that supports users in planning, experiencing, and documenting various mountain activities in Switzerland, including hiking, biking, trail running, and camping. The application is built around five main components:

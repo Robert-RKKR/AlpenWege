@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: alpenwegs-postgres-prod
+    ports:
+      - "${DB_PORT}:5432"
+
+  redis:
+    container_name: alpenwegs-redis-prod
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  init:
+    container_name: alpenwegs-init-prod
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      SECRET_KEY: ${SECRET_KEY}
+
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+
+      RUN_INITIATION: "1"
+    command: python manage.py collectstatic --noinput
+    volumes:
+      - staticfiles:/app/staticfiles
+    depends_on:
+      - postgres
+      - redis
+    restart: "no"
+    networks: [alpenwegs]
+
+  backend:
+    container_name: alpenwegs-backend-prod
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      SECRET_KEY: ${SECRET_KEY}
+
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+
+      RUN_INITIATION: "0"
+    command: gunicorn alpenwegs.wsgi:application \
+             --bind 0.0.0.0:8000 \
+             --workers 3 \
+             --timeout 120
+    volumes:
+      - staticfiles:/app/staticfiles
+    ports:
+      - "${BACKEND_PORT}:8000"
+    depends_on:
+      - init
+    networks: [alpenwegs]
+
+  celery:
+    container_name: alpenwegs-celery-prod
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    command: celery -A alpenwegs worker -Q process_model_tasks -l INFO
+    depends_on:
+      - backend
+      - redis
+    networks: [alpenwegs]
+
+  frontend:
+    container_name: alpenwegs-frontend-prod
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - backend
+    networks: [alpenwegs]

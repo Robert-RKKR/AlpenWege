@@ -1,0 +1,84 @@
+services:
+  postgres:
+    container_name: alpenwegs-postgres-dev
+    ports:
+      - "${DB_PORT}:5432"
+
+  redis:
+    container_name: alpenwegs-redis-dev
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  backend:
+    container_name: alpenwegs-backend-dev
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      SECRET_KEY: ${SECRET_KEY}
+
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+
+      RUN_INITIATION: "1"
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+      - staticfiles:/app/staticfiles
+    ports:
+      - "${BACKEND_PORT}:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - alpenwegs
+
+  celery:
+    container_name: alpenwegs-celery-dev
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      DEBUG: "1"
+
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    command: celery -A alpenwegs worker -Q process_model_tasks -l INFO
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+      - postgres
+    networks:
+      - alpenwegs
+
+  frontend:
+    container_name: alpenwegs-frontend-dev
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile.dev
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    depends_on:
+      - backend
+    networks:
+      - alpenwegs
