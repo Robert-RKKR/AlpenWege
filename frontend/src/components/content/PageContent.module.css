@@ -1,6 +1,9 @@
+/* Global layout wrapper */
 .wrapper {
   width: 100%;
+  display: flex;
   align-items: flex-start;
+  min-width: 0;
 }
 
 /* Left Page Content */
@@ -9,6 +12,7 @@
   top: var(--app-header-height);
   height: calc(100vh - 100px);
   background: var(--mantine-color-body);
+  overflow: hidden;
 }
 
 /* Right Page Content */
@@ -16,8 +20,10 @@
   flex: 1;
   min-width: 0;
   height: calc(100vh - 100px);
+  overflow: hidden;
 }
 
+/* Mobile Layout Overrides */
 @media (max-width: 768px) {
   .wrapper {
     flex-direction: column;

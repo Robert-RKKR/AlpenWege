@@ -1,5 +1,4 @@
 // Imports:
-import { Grid, Stack, Title, Center, Loader, Accordion, TextInput, RangeSlider, Paper } from "@mantine/core";
 import { ErrorWindow } from "../../elements/errorWindow/ErrorWindow";
 import type { ApiListResponse } from "../../../services/api/types";
 import { IconDatabaseOff, IconInbox } from "@tabler/icons-react";
@@ -9,6 +8,17 @@ import { PageContent } from "../../content/PageContent";
 import { useQuery } from "@tanstack/react-query";
 import { ObjectCard } from "./card/ObjectCard";
 import { useState } from "react";
+import {
+  Grid,
+  Stack,
+  Title,
+  Center,
+  Loader,
+  Accordion,
+  TextInput,
+  RangeSlider,
+  Paper,
+} from "@mantine/core";
 
 // Helpers:
 function resolvePath(obj: any, path?: string[]) {
@@ -16,7 +26,7 @@ function resolvePath(obj: any, path?: string[]) {
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 
-// Types (unchanged)
+// Types
 type ResolvedFieldConfig = {
   key: string;
   label?: string;
@@ -24,11 +34,13 @@ type ResolvedFieldConfig = {
   suffix?: string;
   fallback?: string;
 };
+
 type HrefFieldConfig = {
   id: string;
   base: string;
   value?: string[];
 };
+
 type ObjectListProps<TModel> = {
   config: {
     api: {
@@ -64,6 +76,10 @@ export function ObjectListComponent<TModel>({
     placeholderData: (prev) => prev,
   });
 
+  // Normalize data:
+  const pageResults = data?.page_results ?? [];
+  const pageCount = data?.page_count ?? 1;
+
   const listTitle = config.header?.title;
 
   return (
@@ -78,90 +94,93 @@ export function ObjectListComponent<TModel>({
 
       {/* Error */}
       {!isLoading && error && (
-        <ErrorWindow icon={IconDatabaseOff} title="Failed to load data" description="The server returned an error while loading this list."/>
+        <ErrorWindow
+          icon={IconDatabaseOff}
+          title="Failed to load data"
+          description="The server returned an error while loading this list."
+        />
       )}
 
       {/* Empty */}
-      {!isLoading && !error && data && data.page_results.length === 0 && (
-        <ErrorWindow icon={IconInbox} title="Nothing here yet" description={emptyMessage}/>
+      {!isLoading && !error && pageResults.length === 0 && (
+        <ErrorWindow
+          icon={IconInbox}
+          title="Nothing here yet"
+          description={emptyMessage}
+        />
       )}
 
-      {/* Data grid */}
-      {!isLoading && !error && data && data.page_results.length > 0 && (
+      {/* Data */}
+      {!isLoading && !error && pageResults.length > 0 && (
         <PageContent>
-          {/* LEFT MENU */}
-          <PageContent.Item area="menu">
 
-            <Accordion defaultValue="Apples">
-              {/* { searchItems } */}
-              <Accordion.Item key="nameSearch" value="Name Search">
-                <Accordion.Control icon="🍎">Name Search</Accordion.Control>
+          {/* LEFT MENU */}
+          <PageContent.Item>
+            <Accordion>
+              <Accordion.Item value="name-search">
+                <Accordion.Control>Name Search</Accordion.Control>
                 <Accordion.Panel>
-                  <TextInput label="Name" placeholder="Name..." error="Invalid name"/>
+                  <TextInput label="Name" placeholder="Name..." />
                 </Accordion.Panel>
               </Accordion.Item>
-              <Accordion.Item key="distanceSearch" value="Distance Search">
-                <Accordion.Control icon="📏">Distance Search</Accordion.Control>
+
+              <Accordion.Item value="distance-search">
+                <Accordion.Control>Distance Search</Accordion.Control>
                 <Accordion.Panel>
-                  <RangeSlider mb="md" color="blue" max={100} defaultValue={[10, 30]} marks={[
-                    { value: 20, label: '20 Km' },
-                    { value: 40, label: '40 Km' },
-                    { value: 60, label: '60 Km' },
-                    { value: 80, label: '80 Km' },
-                  ]} />
-                  <TextInput label="Name" placeholder="Name..." error="Invalid name"/>
+                  <RangeSlider
+                    mb="md"
+                    max={100}
+                    defaultValue={[10, 30]}
+                    marks={[
+                      { value: 20, label: "20 km" },
+                      { value: 40, label: "40 km" },
+                      { value: 60, label: "60 km" },
+                      { value: 80, label: "80 km" },
+                    ]}
+                  />
                 </Accordion.Panel>
               </Accordion.Item>
             </Accordion>
-
-            <Center pt="md">
-              <Pagination page={page} pageCount={data.page_count} onChange={setPage}/>
-            </Center>
-
           </PageContent.Item>
 
-
           {/* RIGHT CONTENT */}
-          <PageContent.Item area="content">
-            {/* Header */}
-            <Paper withBorder mb="md" p="md">
-              <Center>
-                <Title order={3}>{listTitle}</Title>
-              </Center>
-            </Paper>
+          <PageContent.Item>
+            {listTitle && (
+              <Paper withBorder mb="md" p="md">
+                <Center>
+                  <Title order={3}>{listTitle}</Title>
+                </Center>
+              </Paper>
+            )}
 
-            {/* Cards */}
             <Grid gutter="md">
-              {data.page_results.map((item: any) => {
+              {pageResults.map((item: any) => {
                 const href =
                   config.card.href.base +
-                  (item[config.card.href.id] ?? "");
+                  (item?.[config.card.href.id] ?? "");
 
                 return (
-                  <Grid.Col key={item.pk ?? crypto.randomUUID()} span={{ base: 12, sm: 6, md: 4, lg: 3, xl: 3 }}>
+                  <Grid.Col
+                    key={item.pk ?? crypto.randomUUID()}
+                    span={{ base: 12, sm: 6, md: 4, lg: 3, xl: 3 }}
+                  >
                     <ObjectCard
                       href={href}
-                      image={
-                        resolvePath(item, config.card.image?.value) ??
-                        undefined
-                      }
-                      title={
-                        resolvePath(item, config.card.title?.value) ?? ""
-                      }
+                      image={resolvePath(item, config.card.image?.value)}
+                      title={resolvePath(item, config.card.title?.value) ?? ""}
                       description={
-                        resolvePath(item, config.card.description?.value) ??
-                        ""
+                        resolvePath(item, config.card.description?.value) ?? ""
                       }
                       properties={
                         config.card.properties?.map(
-                          (p: any) =>
-                            `${resolvePath(item, p.value) ?? ""}${p.suffix ?? ""}`,
+                          (p) =>
+                            `${resolvePath(item, p.value) ?? ""}${p.suffix ?? ""}`
                         ) ?? []
                       }
                       extras={
                         config.card.extras?.map(
-                          (e: any) =>
-                            `${resolvePath(item, e.value) ?? ""}${e.suffix ?? ""}`,
+                          (e) =>
+                            `${resolvePath(item, e.value) ?? ""}${e.suffix ?? ""}`
                         ) ?? []
                       }
                     />
@@ -169,10 +188,16 @@ export function ObjectListComponent<TModel>({
                 );
               })}
             </Grid>
+
             <Center pt="md">
-              <Pagination page={page} pageCount={data.page_count} onChange={setPage}/>
+              <Pagination
+                page={page}
+                pageCount={pageCount}
+                onChange={setPage}
+              />
             </Center>
           </PageContent.Item>
+
         </PageContent>
       )}
     </Stack>

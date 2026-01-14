@@ -1,78 +1,81 @@
-// Imports:
+// Imports
 import { Box, Flex, ScrollArea, Divider } from "@mantine/core";
-import classes from "./PageContent.module.css";
+import type { ReactNode, ReactElement } from "react";
+import { Children, isValidElement } from "react";
 import { useMediaQuery } from "@mantine/hooks";
-import type { ReactNode } from "react";
+import classes from "./PageContent.module.css";
 
-type PageContentType = "full" | "menu";
-type PageContentArea = "menu" | "content";
-
+// Types:
 type PageContentProps = {
-  type: PageContentType;
   children: ReactNode;
 };
 
 type PageContentItemProps = {
-  area: PageContentArea;
   children: ReactNode;
 };
 
+/**
+ * Optional slot wrapper.
+ * If used, area is explicit.
+ */
 function PageContentItem({ children }: PageContentItemProps) {
   return <>{children}</>;
 }
 
+// PageContent Component:
 export function PageContent({ children }: PageContentProps) {
-
-  // Responsive check:
   const isMobile = useMediaQuery("(max-width: 48em)");
 
-  // Menu layout
-  const items = Array.isArray(children) ? children : [children];
+  /* Normalize children once. */
+  const items = Children.toArray(children).filter(isValidElement) as ReactElement[];
 
-  const menu = items.find(
-    (child: any) => child?.props?.area === "menu",
-  );
-  const content = items.find(
-    (child: any) => child?.props?.area === "content",
-  );
+  // If explicit areas are used, map them:
+  const menu = items[0];
+  const content = items[1];
 
+  /* Mobile layout */
   if (isMobile) {
     return (
       <ScrollArea h="100%">
         <Box p="md">
-          {/* Menu first */}
-          <Box mb="md">{menu}</Box>
-
-          <Divider my="sm" />
-
-          {/* Content full width */}
-          <Box>{content}</Box>
+          {menu && <Box mb="md">{menu}</Box>}
+          {menu && content && <Divider my="sm" />}
+          {content && <Box>{content}</Box>}
         </Box>
       </ScrollArea>
     );
   }
 
+  /* Desktop layout */
   return (
-    <Flex h="100%" align="stretch">
-      
-      {/* Left Content */}
-      <Box w={280} className={classes.leftContent}>
-        <ScrollArea>
-          <Box>{menu}</Box>
-        </ScrollArea>
-      </Box>
+    <Flex h="100%" align="stretch" className={classes.wrapper}>
+      {/* LEFT MENU */}
+      {menu && (
+        <Box w={280} className={classes.leftContent}>
+          <ScrollArea>
+            <Box>{menu}</Box>
+          </ScrollArea>
+        </Box>
+      )}
 
-      <Divider orientation="vertical" size="xs" />
+      {menu && content && <Divider orientation="vertical" size="xs" />}
 
-      {/* RIGHT CONTENT */}
-      <Box flex={1}>
-        <ScrollArea className={classes.rightContentScrollArea} offsetScrollbars scrollbarSize={6} scrollHideDelay={100}>
-          <Box p="md">{content}</Box>
-        </ScrollArea>
-      </Box>
-
+      {/* MAIN CONTENT */}
+      {content && (
+        <Box flex={1}>
+          <ScrollArea
+            className={classes.rightContentScrollArea}
+            offsetScrollbars
+            scrollbarSize={6}
+            scrollHideDelay={100}
+          >
+            <Box p="md">{content}</Box>
+          </ScrollArea>
+        </Box>
+      )}
     </Flex>
   );
 }
 
+/* Slot export */
 PageContent.Item = PageContentItem;
