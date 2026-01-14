@@ -1,51 +1,105 @@
 services:
+  # ============================
+  # PostgreSQL – Development DB
+  # ============================
   postgres:
+    # Dedicated PostgreSQL container for local development
+    # Holds application data for the Django backend
     container_name: alpenwegs-postgres-dev
+
+    # Expose PostgreSQL port to host for local access
+    # Port value is injected via environment (.env)
     ports:
       - "${DB_PORT}:5432"
 
+
+  # ============================
+  # Redis – Cache & Broker
+  # ============================
   redis:
+    # Redis is used for:
+    # - Django caching
+    # - Celery message broker
     container_name: alpenwegs-redis-dev
+
+    # Expose Redis port to host (optional, useful for debugging)
     ports:
       - "${REDIS_PORT}:6379"
 
+
+  # ============================
+  # Django Backend – Dev Server
+  # ============================
   backend:
+    # Django backend running in development mode
+    # Uses Django's built-in runserver
     container_name: alpenwegs-backend-dev
+
+    # Build backend image from backend Dockerfile
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
+
+    # Environment variables for Django configuration
     environment:
+      # Enable Django debug mode
       DEBUG: "1"
+
+      # Allow all hosts in development
       DJANGO_ALLOWED_HOSTS: "*"
+
+      # Django secret key (injected from .env)
       SECRET_KEY: ${SECRET_KEY}
 
+      # Database connection settings
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_HOST: postgres
       DB_PORT: "5432"
 
+      # Redis connection settings
       REDIS_HOST: redis
       REDIS_PORT: "6379"
 
+      # Custom flag to trigger initialization logic on startup
       RUN_INITIATION: "1"
+
+    # Start Django development server
     command: python manage.py runserver 0.0.0.0:8000
+
+    # Mount backend source code for live reload during development
     volumes:
       - ./backend:/app
       - staticfiles:/app/staticfiles
+
+    # Expose backend API port to host
     ports:
       - "${BACKEND_PORT}:8000"
+
+    # Ensure dependent services are started first
     depends_on:
       - postgres
       - redis
+
+    # Attach to shared application network
     networks:
       - alpenwegs
 
+
+  # ============================
+  # Celery Worker – Async Tasks
+  # ============================
   celery:
+    # Celery worker for background processing
+    # Uses the same backend image as Django
     container_name: alpenwegs-celery-dev
+
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
+
+    # Environment variables required for DB and Redis access
     environment:
       DEBUG: "1"
 
@@ -57,28 +111,55 @@ services:
 
       REDIS_HOST: redis
       REDIS_PORT: "6379"
+
+    # Start Celery worker
+    # Listens only to the `process_model_tasks` queue
     command: celery -A alpenwegs worker -Q process_model_tasks -l INFO
+
+    # Mount backend source code for shared task logic
     volumes:
       - ./backend:/app
+
+    # Ensure required services are running
     depends_on:
       - backend
       - redis
       - postgres
+
+    # Attach to shared application network
     networks:
       - alpenwegs
 
+
+  # ============================
+  # Frontend – Vite Dev Server
+  # ============================
   frontend:
+    # Frontend container running Vite dev server
+    # Provides hot module reload for local development
     container_name: alpenwegs-frontend-dev
+
+    # Build frontend dev image
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile.dev
+
+    # Environment variables used by Vite
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+
+    # Mount frontend source code for instant reload
     volumes:
       - ./frontend:/app
+
+    # Expose Vite dev server to host
     ports:
       - "${FRONTEND_PORT}:5173"
+
+    # Ensure backend API is available
     depends_on:
       - backend
+
+    # Attach to shared application network
     networks:
       - alpenwegs

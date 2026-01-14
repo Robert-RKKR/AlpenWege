@@ -1,23 +1,56 @@
 services:
+  # ============================
+  # PostgreSQL + PostGIS
+  # ============================
   postgres:
+    # PostgreSQL database with PostGIS extension enabled
+    # Required for geospatial queries (maps, routes, GPX, regions)
     image: postgis/postgis:16-3.4
+
+    # Database initialization variables
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
+
+    # Persist database data across container restarts
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    # Attach database to application network
     networks:
       - alpenwegs
 
+
+  # ============================
+  # Redis – In-Memory Store
+  # ============================
   redis:
+    # Redis used as:
+    # - Cache backend
+    # - Celery message broker
     image: redis:7-alpine
+
+    # Attach Redis to application network
     networks:
       - alpenwegs
 
+
+# ============================
+# Application Networks
+# ============================
 networks:
   alpenwegs:
+    # Isolated bridge network for all AlpenWegs services
+    # Allows service discovery via container names
 
+
+# ============================
+# Persistent Volumes
+# ============================
 volumes:
+  # Persistent PostgreSQL data
   postgres_data:
+
+  # Shared static files collected by Django
   staticfiles:

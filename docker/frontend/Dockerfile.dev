@@ -1,13 +1,33 @@
+# ============================
+# Frontend Development Stage
+# ============================
+
+# Use Node.js 20 on Alpine Linux
+# This image is optimized for development:
+# - Includes Node.js runtime
+# - Lightweight base image
+# - Suitable for running Vite dev server with hot reload
 FROM node:20-alpine
 
+# Set the working directory inside the container
+# All frontend-related commands will be executed from this path
 WORKDIR /app
 
-# Install dependencies
+# Copy frontend dependency definition files (package.json, package-lock.json)
+# This step allows Docker to cache dependency installation
+# and avoid re-installing packages on every source code change
 COPY frontend/package*.json ./
+
+# Install frontend dependencies
+# Uses npm install to support development workflows
+# (hot reload, optional dependency changes, etc.)
 RUN npm install
 
-# Copy source
+# Copy the complete frontend source code into the container
+# Includes Vite config, TypeScript files, assets, and components
 COPY frontend .
 
-# Start Vite dev server
+# Start the Vite development server
+# --host 0.0.0.0 allows access from outside the container
+# (required when running inside Docker)
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

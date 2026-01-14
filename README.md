@@ -2,34 +2,17 @@
 
 ![Main photo](project/img/main_photo.png)
 
-Standard dev run (foreground)
+## Installation
+
+## Docker installation
+
+```bash
 docker compose \
   --env-file .env.dev \
   -f docker-compose.yml \
   -f docker-compose.dev.yml \
   up --build
-
-Dev run in background (recommended)
-docker compose \
-  --env-file .env.dev \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  up --build -d
-
-
-How to stop DEV stack
-docker compose \
-  --env-file .env.dev \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  down
-
-How to fully reset DEV (volumes + images)
-docker compose \
-  --env-file .env.dev \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  down -v --remove-orphans
+```
   
 ## Overview
 
