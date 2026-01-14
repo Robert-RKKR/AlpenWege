@@ -7,7 +7,6 @@ from alpenwegs.ashared.api.serializers.base_serializers import (
 from alpenwegs.ashared.api.serializers.base_model_variables import (
     base_identification_read_only_fields,
     base_sport_category_read_only_fields,
-    base_characteristic_read_only_fields,
     base_statistic_read_only_fields,
     base_timestamp_read_only_fields,
     base_multi_day_read_only_fields,
@@ -16,7 +15,6 @@ from alpenwegs.ashared.api.serializers.base_model_variables import (
     base_score_read_only_fields,
     base_identification_fields,
     base_representation_fields,
-    base_characteristic_fields,
     base_sport_category_fields,
     base_statistic_fields,
     base_timestamp_fields,
@@ -49,7 +47,6 @@ journey_fields = [
 # Journey model serializer combined fields:
 fields = (
     base_model_fields
-    + base_characteristic_fields
     + base_identification_fields
     + base_sport_category_fields
     + base_timestamp_fields
@@ -62,7 +59,6 @@ fields = (
 read_only_fields = (
     base_model_read_only_fields
     + base_identification_read_only_fields
-    + base_characteristic_read_only_fields
     + base_sport_category_read_only_fields
     + base_statistic_read_only_fields
     + base_timestamp_read_only_fields

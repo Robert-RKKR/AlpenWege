@@ -25,15 +25,26 @@ APP_NAME = 'AlpenWegs'
 VERSION = '0.1a'
 
 # Database Constance's:
-DB_PASS = os.environ['DB_PASS']
-DB_USER = os.environ['DB_USER']
-DB_NAME = os.environ['DB_NAME']
-DB_HOST = os.environ['DB_HOST']
-DB_PORT = os.environ['DB_PORT']
+DB_PASS = os.environ.get('DB_PASS', default='alpenwegs_password')
+DB_USER = os.environ.get('DB_USER', default='alpenwegs_admin')
+DB_HOST = os.environ.get('DB_HOST', default='127.0.0.1')
+DB_NAME = os.environ.get('DB_NAME', default='alpenwegs')
+DB_PORT = os.environ.get('DB_PORT', default=5555)
 
 # Redis Constance's:
-REDIS_HOST = os.environ['REDIS_HOST']
-REDIS_PORT = os.environ['REDIS_PORT']
+REDIS_HOST = os.environ.get('REDIS_HOST', default='127.0.0.1')
+REDIS_PORT = os.environ.get('REDIS_PORT', default=6666)
+
+# # Database Constance's:
+# DB_PASS = os.environ['DB_PASS']
+# DB_USER = os.environ['DB_USER']
+# DB_NAME = os.environ['DB_NAME']
+# DB_HOST = os.environ['DB_HOST']
+# DB_PORT = os.environ['DB_PORT']
+
+# # Redis Constance's:
+# REDIS_HOST = os.environ['REDIS_HOST']
+# REDIS_PORT = os.environ['REDIS_PORT']
 
 # Application keys Constance's:
 SECRET_KEY = os.environ.get('SECRET_KEY',

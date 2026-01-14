@@ -106,9 +106,15 @@ def base_exception_handler(
     )
 
     # Return error response:
+    if response is None:
+        return Response(
+            data=error_response,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
     return Response(
         data=error_response,
-        status=response.status_code
+        status=response.status_code,
     )
 
     try:

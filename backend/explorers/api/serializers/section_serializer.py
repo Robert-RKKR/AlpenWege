@@ -27,7 +27,6 @@ from alpenwegs.ashared.api.serializers.base_model_variables import (
 # AlpenWegs application import:
 from alpenwegs.ashared.constants.sport_category_difficulty import SportCategoryDifficultyChoices
 from compendiums.api.serializers.region_serializer import RegionRelationSerializer
-from compendiums.api.serializers.card_serializer import CardRelationSerializer
 from compendiums.api.serializers.poi_serializer import PoiRelationSerializer
 from profiles.api.serializers.user_serializer import UserRelationSerializer
 from assets.api.serializers.photo_serializer import PhotoRelationSerializer
@@ -36,12 +35,12 @@ from alpenwegs.ashared.constants.season_category import SeasonChoices
 from alpenwegs.ashared.constants.season_category import MonthChoices
 from explorers.models.section_model import SectionModel
 from compendiums.models.region_model import RegionModel
-from compendiums.models.card_model import CardModel
 from compendiums.models.poi_model import PoiModel
 from assets.models.photo_model import PhotoModel
 
 # Rest framework import:
 from rest_framework.serializers import HyperlinkedIdentityField
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 
@@ -55,7 +54,6 @@ section_fields = [
     'regions',
     'end_poi',
     'photos',
-    'cards',
     'pois',
 ]
 section_gpx_fields = [
@@ -137,13 +135,6 @@ class SectionDetailedSerializer(
     regions = SerializedPkRelatedField(
         queryset=RegionModel.objects.all(),
         serializer=RegionRelationSerializer,
-        required=False,
-        allow_null=True,
-        many=True,
-    )
-    cards = SerializedPkRelatedField(
-        queryset=CardModel.objects.all(),
-        serializer=CardRelationSerializer,
         required=False,
         allow_null=True,
         many=True,
@@ -257,6 +248,21 @@ class SectionRelationSerializer(
         help_text='URL to provided object.',
         read_only=True,
     )
+
+    @extend_schema_field({
+        "type": "object",
+        "properties": {
+            "lat": {"type": "number"},
+            "lng": {"type": "number"},
+        },
+    })
+    def get_location(self, obj):
+        if not obj.location:
+            return None
+        return {
+            "lat": obj.location.y,
+            "lng": obj.location.x,
+        }
 
     class Meta:
         read_only_fields = read_only_fields
