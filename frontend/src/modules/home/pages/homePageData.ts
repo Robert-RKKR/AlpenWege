@@ -1,91 +1,55 @@
 // Imports:
-import { 
-  IconRoute, IconNavigation, IconPhoto, IconBook2,
-  IconUsersGroup, IconCookie, IconGauge, IconUser,
-  IconMountain, IconTimeline, IconMap2
+import {
+  IconNavigation,
+  IconNotebook,
+  IconTimeline,
+  IconCompass,
+  IconRoute,
+  IconSun,
 } from '@tabler/icons-react';
-
-/* Primary feature navigation (top section) */
-export const primaryFeatures = [
-  {
-    icon: IconRoute,
-    title: "Plan your adventure",
-    description:
-      "Create single-day or multi-day hiking, biking, or trail running plans with flexible routes, difficulty options, and terrain-aware paths across Switzerland.",
-    to: "/explorer",
-  },
-  {
-    icon: IconNavigation,
-    title: "Navigate and track",
-    description:
-      "Follow your planned trail in real time with geolocation tracking, checkpoints, and route guidance while recording your activity on the go.",
-    to: "/explorer/track",
-  },
-  {
-    icon: IconPhoto,
-    title: "Record and relive",
-    description:
-      "Save completed activities with GPX tracks, photos, notes, and personal tags to build a meaningful adventure journal and lasting memories.",
-    to: "/profiles/journal",
-  },
-  {
-    icon: IconBook2,
-    title: "Explore the Compendium",
-    description:
-      "Discover in-depth knowledge about Swiss regions, trails, landmarks, and nature to deepen your connection with every place you visit.",
-    to: "/compendium",
-  },
-  {
-    icon: IconUsersGroup,
-    title: "Hike together",
-    description:
-      "Create or join outdoor events, meet fellow enthusiasts, and explore trails together through community-driven hikes.",
-    to: "/events",
-  },
-];
 
 /* Platform principles / values (secondary section) */
 export const platformHighlights = [
   {
-    title: "Performance-focused",
+    title: "Journey-centric design",
     description:
-      "Optimized route processing, GPX handling, and statistics ensure fast interaction even with complex multi-day adventures.",
-    icon: IconGauge,
-    to: "/about/performance",
+      "AlpenWege is built around complete outdoor journeys rather than isolated activities, supporting planning, execution, and long-term reflection within a single coherent system.",
+    icon: IconCompass,
+    to: "/about/philosophy",
   },
   {
-    title: "Privacy by design",
+    title: "Flexible planning",
     description:
-      "Your activities, routes, and memories remain under your control, with transparent data handling and no hidden tracking.",
-    icon: IconUser,
-    to: "/about/privacy",
+      "Plan both single-day and multi-day adventures using a structured model of trails, routes, and paths, allowing alternative options based on difficulty, terrain, or scenery.",
+    icon: IconRoute,
+    to: "/about/planning",
   },
   {
-    title: "No third-party dependency lock-in",
+    title: "Smart preparation",
     description:
-      "AlpenWeg avoids unnecessary external platforms, keeping your data portable and the system future-proof.",
-    icon: IconCookie,
-    to: "/about/architecture",
+      "Integrated SBB timetables recommend optimal transport to trailheads, while Swiss Meteo weather data helps users prepare safely for current and forecasted conditions.",
+    icon: IconSun,
+    to: "/about/preparation",
   },
   {
-    title: "Built for the Alps",
+    title: "Guided execution",
     description:
-      "Designed specifically for alpine terrain, Swiss regions, elevation profiles, and real-world hiking conditions.",
-    icon: IconMountain,
-    to: "/about/alpine-focus",
+      "Use AlpenWege as a real-time navigation companion during activities, with geolocation tracking, checkpoints, and live progress aligned to the planned trail.",
+    icon: IconNavigation,
+    to: "/about/execution",
   },
   {
-    title: "Your journey over time",
+    title: "Meaningful recording",
     description:
-      "Track seasonal goals, milestones, and long-term progress across years, not just individual trips.",
+      "Each completed activity becomes a personal journal entry, combining GPX tracks, photos, notes, and statistics with a strong focus on individual experience.",
+    icon: IconNotebook,
+    to: "/about/recording",
+  },
+  {
+    title: "Memories and progress",
+    description:
+      "Track seasonal goals, milestones, and long-term achievements through visual progress indicators that reflect your evolving relationship with the mountains.",
     icon: IconTimeline,
-    to: "/about/goals",
-  },
-  {
-    title: "Geography-first design",
-    description:
-      "Maps, regions, routes, and points of interest are first-class elements throughout the entire platform.",
-    icon: IconMap2,
-    to: "/about/geography",
+    to: "/about/memories",
   },
 ];
