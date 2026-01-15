@@ -27,18 +27,20 @@ class BaseListRepresentationModelMixin(
     ) -> Response:
         
         # Collect queryset value:
-        queryset = self.query_model.objects.all(
-            ).order_by(
-                self.query_ordering
-            )
+        queryset = (
+            self._collect_queryset()
+            .only("id", "name")
+            .select_related(None)
+            .prefetch_related(None)
+        )
 
         # Collect all instances:
         queryset = self.filter_queryset(queryset)
-        
+
         # Prepare page view without pagination:
         serializer = self._get_serializer(
             queryset,
-            serializer_name='representation',
+            serializer_name="representation",
             many=True,
         )
 

@@ -5,6 +5,7 @@ from alpenwegs.ashared.models.sport_category_model import BaseSportCategoryModel
 from alpenwegs.ashared.models.relationship_model import BaseRelationshipModel
 from alpenwegs.ashared.models.accomplished_model import BaseAccomplishedModel
 from alpenwegs.ashared.models.descriptive_model import BaseDescriptiveModel
+from alpenwegs.ashared.models.creator_model import creator_object_index
 from alpenwegs.ashared.models.statistic_model import BaseStatisticModel
 from alpenwegs.ashared.models.timestamp_model import BaseTimestampModel
 from alpenwegs.ashared.models.gpx_track_model import BaseGpxTrackModel
@@ -53,6 +54,11 @@ class TrackModel(
         # Model name values:
         verbose_name = 'Track'
         verbose_name_plural = 'Tracks'
+
+        # Database indexes:
+        indexes = [
+            creator_object_index,
+        ]
 
         # Add custom AlpenWegs permissions:
         permissions = [
