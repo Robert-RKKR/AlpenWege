@@ -13,6 +13,7 @@ from alpenwegs.ashared.models.base_model import BaseModel
 from profiles.models.user_model import UserModel
 
 # Django import:
+from django.db.models import Q
 from django.db import models
 
 
@@ -42,6 +43,13 @@ class BaseCreatorModel(
         # Abstract class value:
         abstract = True
 
+        # Database indexes:
+        indexes = [
+            models.Index(fields=["is_public"]),
+            models.Index(fields=["creator"]),
+            models.Index(fields=["creator", "is_public"]),
+        ]
+
     # Creator model values:
     creator = models.ForeignKey(
         UserModel,
@@ -58,3 +66,10 @@ class BaseCreatorModel(
             'the object will be visible to all users and guests.',
         default=True,
     )
+
+# Conditional index for public objects:
+creator_object_index = models.Index(
+    fields=['is_public', 'id'],
+    condition=Q(is_public=True),
+    name="%(class)s_public_idx",
+)

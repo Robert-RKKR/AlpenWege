@@ -1,5 +1,6 @@
 # AlpenWegs import:
 from alpenwegs.ashared.api.base_exceptions import PermissionAPIException
+from alpenwegs.ashared.models.creator_model import BaseCreatorModel
 from alpenwegs.ashared.api.mixins.base_mixin import BaseMixin
 
 # AlpenWegs application import:
@@ -11,6 +12,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 
 class BaseListModelMixin(
@@ -31,57 +33,39 @@ class BaseListModelMixin(
         - Otherwise → return all objects.
         """
 
-        # Check if user is authenticated:
-        if not self.request.user.is_authenticated:
-            
-            try:
-                # If model supports public visibility, return only public objects:
-                self.query_model._meta.get_field('is_public')
+        # Collect model and user:
+        model = self.query_model
+        user = self.request.user
 
-                # Return only public objects:
-                return self.query_model.objects.filter(
-                    is_public=True
-                ).order_by(
-                    self.query_ordering
-                )
-            
-            # If model has no public field:
-            except FieldDoesNotExist:
+        # If model is UserModel return only the user itself:
+        if model is UserModel:
+            # Check if user is authenticated:
+            if not user.is_authenticated:
                 # Return empty queryset:
-                return self.query_model.objects.none()
+                return model.objects.none()
+            # Return only the user object itself:
+            return model.objects.filter(pk=user.pk)
 
-        # Check if request user is instance of UserModel:
-        if isinstance(self.query_model, UserModel):
-            # Filter only user that is requesting the data:
-            return self.query_model.objects.filter(
-                pk=self.request.user.pk,
-            ).order_by(
-                self.query_ordering
+        # Check if model is subclass of BaseCreatorModel:
+        if issubclass(model, BaseCreatorModel):
+            # Check if user is authenticated:
+            if not user.is_authenticated:
+                # Return only public objects:
+                return model.objects.filter(is_public=True)
+
+            # Return objects created by the user or public objects:
+            return model.objects.filter(
+                Q(is_public=True) | Q(creator=user)
             )
 
-        # If user is authenticated, and is not UserModel instance:
-        try:
-            # Check if model has creator field:
-            self.query_model._meta.get_field('creator')
-            
-            # Filter only objects created by the requesting user:
-            return self.query_model.objects.filter(
-                creator=self.request.user,
-            ).order_by(
-                self.query_ordering
-            )
-        
-        except FieldDoesNotExist:
-            # Define error details list:
-            error_details = {
-                'error_message': 'Model does not have a creator field.',
-                'error_code': 'permission_denied',
+        # If model is not subclass of BaseCreatorModel, raise permission exception:
+        raise PermissionAPIException(
+            # Raise permission denied exception:
+            error_details={
+                "error_message": "Model does not support list access.",
+                "error_code": "permission_denied",
             }
-
-            # Raise validation API exception with collected details:
-            raise PermissionAPIException(
-                error_details=error_details,
-            )
+        )
 
     def _call_list(self,
         request: Response,

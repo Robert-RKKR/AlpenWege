@@ -6,9 +6,12 @@ from alpenwegs.ashared.models.sport_category_model import BaseSportCategoryModel
 from alpenwegs.ashared.models.relationship_model import BaseRelationshipModel
 from alpenwegs.ashared.models.descriptive_model import BaseDescriptiveModel
 from alpenwegs.ashared.models.timestamp_model import BaseTimestampModel
+from alpenwegs.ashared.models.creator_model import creator_object_index
 from alpenwegs.ashared.models.creator_model import BaseCreatorModel
 from alpenwegs.ashared.models.liked_model import BaseLikedModel
 from alpenwegs.ashared.models.gpx_model import BaseGpxModel
+
+
 
 # AlpenWegs application import:
 from compendiums.models.region_model import RegionModel
@@ -52,6 +55,11 @@ class SectionModel(
         # Model name values:
         verbose_name = 'Section'
         verbose_name_plural = 'Sections'
+
+        # Database indexes:
+        indexes = [
+            creator_object_index,
+        ]
 
         # Add custom AlpenWegs permissions:
         permissions = [
