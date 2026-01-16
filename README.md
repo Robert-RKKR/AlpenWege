@@ -1,8 +1,13 @@
 # AlpenWege
 
-![Main photo](project/img/main_photo.png)
+<p align="center">
+  <img src="project/img/main_photo.png" alt="AlpenWege main photo" width="500">
+</p>
 
 ## Installation
+
+AlpenWege can be run locally for development or testing using Docker.  
+The setup below uses a development environment with predefined service configurations.
 
 ## Docker installation
 
@@ -185,3 +190,11 @@ This document outlines the selected technology stack for the AlpenWege project, 
 - [Schweizer Wanderwege - Wanderung der Calancasca](https://www.schweizer-wanderwege.ch/de/wandervorschlaege/2041/Wanderung-der-Calancasca-entlang-im-Parco-Val-Calanca#content_hike)
 - [Strava Global Heatmap](https://www.strava.com/maps/global-heatmap?sport=MountainBikeRide&style=standard&terrain=false&labels=true&poi=true&cPhotos=true&gColor=mobileblue&gOpacity=100#10.74/47.1064/8.7042)
 - [Hiking Buddies - Routes](https://www.hiking-buddies.com/routes/routes_list/)
+
+## Gallery:
+
+<p align="center">
+  <img src="project/img/main_page.png" alt="Main page" width="300">
+  <img src="project/img/model_page.png" alt="Model page" width="300">
+  <img src="project/img/login_page.png" alt="Login page" width="300">
+</p>
