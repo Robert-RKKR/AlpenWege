@@ -54,13 +54,7 @@ export type SearchItemConfig =
       itemValue: [string, string]; // e.g. ["total_distance__gt","total_distance__lt"]
       itemType: "range";
       itemDescription?: string;
-
-      /**
-       * Range UI options:
-       * - slider: RangeSlider
-       * - inputs: two NumberInput
-       */
-      ui?: "slider" | "inputs";
+      itemUi?: "slider" | "inputs";
 
       // slider config
       sliderMin?: number;

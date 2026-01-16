@@ -19,6 +19,7 @@ import {
   Title,
   Tooltip,
   Accordion,
+  Flex,
   Pagination as MantinePagination,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
@@ -328,31 +329,35 @@ export function ListModelComponent<TModel>({
       <PageContent.Item>
         <Stack gap="md">
           <Paper withBorder radius="md" p="md">
-            <Title order={3}>{pageContent.listTitle}</Title>
-            {pageContent.listDescription && (
-              <Text c="dimmed" mt={4}>
-                {pageContent.listDescription}
-              </Text>
-            )}
+            <Flex justify="space-between" gap="xs">
+              <Flex direction="column" gap="xs">
+                <Title order={3}>{pageContent.listTitle}</Title>
+                {pageContent.listDescription && (
+                  <Text c="dimmed" mt={4}>
+                    {pageContent.listDescription}
+                  </Text>
+                )}
+              </Flex>
 
-            <Group justify="space-between" mt="md">
-              <Text size="sm" c="dimmed">
-                {isFetching
-                  ? "Loading…"
-                  : data?.total_count
-                  ? `${data.total_count} results`
-                  : ""}
-              </Text>
+              <Group justify="space-between" mt="md">
+                <Text size="sm" c="dimmed">
+                  {isFetching
+                    ? "Loading…"
+                    : data?.total_count
+                    ? `${data.total_count} results`
+                    : ""}
+                </Text>
 
-              <SegmentedControl
-                value={view}
-                onChange={(v) => setView(v as ViewMode)}
-                data={[
-                  { value: "cards", label: "Cards" },
-                  { value: "table", label: "Table" },
-                ]}
-              />
-            </Group>
+                <SegmentedControl
+                  value={view}
+                  onChange={(v) => setView(v as ViewMode)}
+                  data={[
+                    { value: "cards", label: "Cards" },
+                    { value: "table", label: "Table" },
+                  ]}
+                />
+              </Group>
+            </Flex>
           </Paper>
 
           {isFetching && (

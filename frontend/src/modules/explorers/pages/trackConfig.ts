@@ -12,7 +12,7 @@ export const trackConfig = {
 
   listPageContent: {
     listTitle: "All Tracks",
-    listDescription: "Browse all available tracks.",
+    listDescription: "Browse all personal and public available tracks",
 
     leftBar: {
       SearchBar: [
@@ -50,21 +50,39 @@ export const trackConfig = {
           sectionIcon: IconRulerMeasure,
           sectionItems: [
             {
-              itemLabel: "Total Distance (m)",
+              itemLabel: "Total Distance (Km)",
               itemValue: ["total_distance__gt", "total_distance__lt"],
               itemType: "range",
-              ui: "slider",
+              itemUi: "slider",
               sliderMin: 0,
-              sliderMax: 50000,
+              sliderMax: 10000,
               sliderStep: 100,
-              sliderDefault: [0, 20000],
+              sliderDefault: [0, 10000],
               sliderMarks: [
                 { value: 0, label: "0" },
-                { value: 10000, label: "10k" },
-                { value: 20000, label: "20k" },
-                { value: 30000, label: "30k" },
+                { value: 2000, label: "20" },
+                { value: 4000, label: "40" },
+                { value: 6000, label: "60" },
+                { value: 8000, label: "80" },
+                { value: 10000, label: "100" },
+              ],
+            },
+            {
+              itemLabel: "Activity Time (s)",
+              itemValue: ["total_time__gt", "total_time__lt"],
+              itemType: "range",
+              itemUi: "slider",
+              sliderMin: 0,
+              sliderMax: 100000,
+              sliderStep: 100,
+              sliderDefault: [0, 100000],
+              sliderMarks: [
+                { value: 0, label: "0" },
+                { value: 20000, label: "10k" },
                 { value: 40000, label: "40k" },
-                { value: 50000, label: "50k" },
+                { value: 60000, label: "60k" },
+                { value: 80000, label: "80k" },
+                { value: 100000, label: "100k" },
               ],
             },
           ],
