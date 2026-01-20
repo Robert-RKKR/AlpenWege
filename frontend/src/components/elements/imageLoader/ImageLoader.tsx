@@ -1,8 +1,14 @@
-// Imports:
 import { Box, Image, Loader, Center } from "@mantine/core";
+import type { BoxProps } from "@mantine/core";
 import { useState } from "react";
 
-type ImageLoaderProps = {
+/**
+ * ImageLoaderProps
+ *
+ * Explicitly allows mouse events while still extending BoxProps.
+ * This avoids Mantine typing gaps and keeps strict type safety.
+ */
+type ImageLoaderProps = BoxProps & {
   src?: string | null;
   alt: string;
   fallback?: string;
@@ -11,6 +17,9 @@ type ImageLoaderProps = {
   width?: number | string;
   fit?: "cover" | "contain";
   radius?: number | string;
+
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onClickCapture?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 export function ImageLoader({
@@ -22,6 +31,11 @@ export function ImageLoader({
   width = "100%",
   fit = "cover",
   radius = "md",
+
+  onClick,
+  onClickCapture,
+
+  ...props
 }: ImageLoaderProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
@@ -29,18 +43,31 @@ export function ImageLoader({
   const imageSrc = !src || error ? fallback : src;
 
   return (
-    <Box pos="relative" h={height} w={width} style={{ borderRadius: radius, overflow: "hidden" }}>
-      {/* Loader overlay */}
+    <Box
+      pos="relative"
+      h={height}
+      w={width}
+      style={{ borderRadius: radius, overflow: "hidden" }}
+      onClick={onClick}
+      onClickCapture={onClickCapture}
+      {...props}
+    >
       {!loaded && (
         <Center pos="absolute" inset={0} style={{ zIndex: 1 }}>
           <Loader size="sm" />
         </Center>
       )}
 
-      {/* Image */}
-      <Image src={imageSrc} alt={alt} fit={fit} height="100%"
-        width="100%" radius={radius} loading="lazy"
-        onLoad={() => setLoaded(true)} onError={() => {
+      <Image
+        src={imageSrc}
+        alt={alt}
+        fit={fit}
+        height="100%"
+        width="100%"
+        radius={radius}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => {
           setError(true);
           setLoaded(true);
         }}

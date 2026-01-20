@@ -5,7 +5,7 @@ import { ListModelComponent } from "../../../components/models/list/ListModelCom
 import type { TrackRelationModel } from "../models/trackModel";
 
 // Config:
-import { trackConfig } from "./trackConfig";
+import { trackConfig } from "../configurations/trackConfig";
 
 // TrackListPage:
 export function TrackListPage() {

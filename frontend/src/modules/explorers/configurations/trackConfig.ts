@@ -9,11 +9,9 @@ export const trackConfig = {
     href: "/explorer/track/",
     id: "pk",
   },
-
   listPageContent: {
     listTitle: "All Tracks",
     listDescription: "Browse all personal and public available tracks",
-
     leftBar: {
       SearchBar: [
         {

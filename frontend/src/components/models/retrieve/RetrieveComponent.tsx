@@ -1,22 +1,36 @@
-// Application imports:
-import { BaseApi } from "../../../services/api/baseApi";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
-
 // Imports:
-import { Paper, Tabs, Stack, Group, Text, Button, Table } from "@mantine/core";
 import { ImageLoader } from "../../elements/imageLoader/ImageLoader";
+import { BaseApi } from "../../../services/api/baseApi";
+import { useParams, Link } from "react-router-dom";
 import { useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "@mantine/hooks";
-import { Carousel } from '@mantine/carousel';
+import { Carousel } from "@mantine/carousel";
+import {
+  Paper,
+  Tabs,
+  Stack,
+  Group,
+  Text,
+  Button,
+  Table,
+  Modal,
+} from "@mantine/core";
 
-// Helpers:
+/**
+ * Helper function
+ *
+ * Safely resolves deeply nested object values
+ * using an array-based path definition
+ */
 function resolvePath(obj: any, path?: string[]) {
   if (!path) return undefined;
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 
-// Types:
+/**
+ * Configuration schema for the retrieve view
+ */
 type ObjectRetrieveConfig = {
   api: {
     listUrl: string;
@@ -55,14 +69,21 @@ type Props<T> = {
   config: ObjectRetrieveConfig;
 };
 
+/**
+ * ObjectRetrieveComponent
+ *
+ * Generic retrieve view capable of rendering
+ * any object based on configuration
+ */
 export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
-
-  // Responsive check:
   const isMobile = useMediaQuery("(max-width: 48em)");
 
-  // State & Params:
   const { id } = useParams<{ id: string }>();
   const [activeChapter, setActiveChapter] = useState<string | null>("0");
+
+  // Modal state for fullscreen image preview
+  const [opened, setOpened] = useState(false);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery<T>({
     queryKey: [config.api.listUrl, id],
@@ -70,16 +91,18 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
     enabled: !!id,
   });
 
+  const [activeImageName, setActiveImageName] = useState<string | null>(null);
+  const [activeImageSnippet, setActiveImageSnippet] = useState<string | null>(null);
+
   const resolvedTitle =
-    data && config.title
-      ? resolvePath(data, config.title.value)
-      : undefined;
+    data && config.title ? resolvePath(data, config.title.value) : undefined;
 
   const resolvedImages =
-    data && config.image
-      ? resolvePath(data, config.image.value)
-      : undefined;
+    data && config.image ? resolvePath(data, config.image.value) : undefined;
 
+  /**
+   * Responsive layout abstraction
+   */
   const ResponsiveLayout = ({
     mobile,
     children,
@@ -98,6 +121,45 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
 
   return (
     <Stack className="object-retrieve" gap="md" mt="md" mb="md">
+      {/* Fullscreen image modal */}
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        centered
+        size="90%"
+        padding="md"
+        overlayProps={{
+          backgroundOpacity: 0.8,
+          blur: 2,
+        }}
+        withCloseButton
+        zIndex={300}
+        title={
+          <Stack gap={2}>
+            <Text fw={600} size="md">
+              {activeImageName}
+            </Text>
+
+            {activeImageSnippet && (
+              <Text size="sm" c="dimmed">
+                {activeImageSnippet}
+              </Text>
+            )}
+          </Stack>
+        }
+      >
+        {activeImage && (
+          <ImageLoader
+            src={activeImage}
+            alt={String(activeImageName ?? resolvedTitle ?? "")}
+            fit="contain"
+            height="80vh"
+            style={{ cursor: "zoom-out" }}
+            onClick={() => setOpened(false)}
+          />
+        )}
+      </Modal>
+
       {/* Title */}
       {!isLoading && !error && resolvedTitle && (
         <Paper withBorder p="md">
@@ -121,16 +183,20 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
         </Paper>
       )}
 
-      {/* Data */}
+      {/* Main content */}
       {!isLoading && !error && data && (
         <ResponsiveLayout mobile={isMobile}>
-          {/* LEFT COLUMN */}
+          {/* Left column */}
           <Stack style={{ flex: 2 }} gap="md">
-            {/* Images */}
+            {/* Image carousel */}
             {Array.isArray(resolvedImages) && resolvedImages.length > 0 && (
               <Paper withBorder>
-                <Carousel withIndicators height={500} slideGap="sm" controlsOffset="md" emblaOptions={{
-                  loop: true, dragFree: false, align: 'center'}}>
+                <Carousel
+                  withIndicators
+                  height={500}
+                  slideGap="sm"
+                  controlsOffset="md"
+                >
                   {resolvedImages.map((item, index) => (
                     <Carousel.Slide key={index}>
                       <ImageLoader
@@ -138,6 +204,13 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
                         alt={String(resolvedTitle ?? "")}
                         height={500}
                         fit="cover"
+                        style={{ cursor: "zoom-in" }}
+                        onClickCapture={() => {
+                          setActiveImage(item.photo?.path ?? null);
+                          setActiveImageName(item.photo?.name ?? null);
+                          setActiveImageSnippet(item.photo?.snippet ?? null);
+                          setOpened(true);
+                        }}
                       />
                     </Carousel.Slide>
                   ))}
@@ -159,26 +232,26 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
 
                   {config.chapters.map((chapter, index) => (
                     <Tabs.Panel key={index} value={String(index)} pt="sm">
-                      <Stack>
-                        <Table striped verticalSpacing="xs" horizontalSpacing="md">
-                          <Table.Tbody>
-                            {chapter.properties.map((p, i) => (
-                              <Table.Tr key={i}>
-                                <Table.Td>
-                                  <Text size="sm" fw={500}>
-                                    {p.label}
-                                  </Text>
-                                </Table.Td>
-                                <Table.Td>
-                                  <Text size="sm">
-                                    {`${resolvePath(data, p.value) ?? ""}${p.suffix ?? ""}`}
-                                  </Text>
-                                </Table.Td>
-                              </Table.Tr>
-                            ))}
-                          </Table.Tbody>
-                        </Table>
-                      </Stack>
+                      <Table striped verticalSpacing="xs" horizontalSpacing="md">
+                        <Table.Tbody>
+                          {chapter.properties.map((p, i) => (
+                            <Table.Tr key={i}>
+                              <Table.Td>
+                                <Text size="sm" fw={500}>
+                                  {p.label}
+                                </Text>
+                              </Table.Td>
+                              <Table.Td>
+                                <Text size="sm">
+                                  {`${resolvePath(data, p.value) ?? ""}${
+                                    p.suffix ?? ""
+                                  }`}
+                                </Text>
+                              </Table.Td>
+                            </Table.Tr>
+                          ))}
+                        </Table.Tbody>
+                      </Table>
                     </Tabs.Panel>
                   ))}
                 </Tabs>
@@ -186,13 +259,12 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
             )}
           </Stack>
 
-          {/* RIGHT COLUMN */}
+          {/* Right column */}
           <Stack style={{ flex: 1 }} gap="md">
-            {/* Properties */}
             {config.properties && (
               <Paper withBorder p="md">
                 <Stack gap="xs">
-                  {config.properties.map((p, i) => (  
+                  {config.properties.map((p, i) => (
                     <Group key={i} justify="space-between">
                       <Text fw={500}>{p.label}</Text>
                       <Text>
@@ -204,10 +276,13 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
               </Paper>
             )}
 
-            {/* Edit button */}
             {id && (
               <Paper withBorder p="md">
-                <Button component={Link} to={`${config.routes.edit}/${id}/edit`} fullWidth>
+                <Button
+                  component={Link}
+                  to={`${config.routes.edit}/${id}/edit`}
+                  fullWidth
+                >
                   Edit
                 </Button>
               </Paper>
