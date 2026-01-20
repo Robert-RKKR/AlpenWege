@@ -1,5 +1,5 @@
 // Application imports:
-import { ObjectRetrieveComponent } from "../../../components/objects/retrieve/RetrieveComponent";
+import { ObjectRetrieveComponent } from "../../../components/models/retrieve/RetrieveComponent";
 import type { TrackDetailedModel } from "../models/trackModel";
 
 // Configuration for ObjectRetrieveComponent to display TrackRelationModel:

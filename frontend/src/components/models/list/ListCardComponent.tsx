@@ -1,5 +1,5 @@
 // ListCardModelComponent.tsx
-import { Badge, Button, Card, Group, SimpleGrid, Spoiler, Text, Tooltip } from "@mantine/core";
+import { Badge, Button, Card, Group, SimpleGrid, Spoiler, Text, Tooltip, Box } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 import { formatValue, resolvePath } from "./listTypes";
@@ -10,17 +10,17 @@ import { ImageLoader } from "../../elements/imageLoader/ImageLoader";
 
 import type { CardViewConfig, BaseModelDataConfig } from "./listTypes";
 
-type ListCardModelComponentProps<TModel> = {
+type ListCardComponentProps<TModel> = {
   items: TModel[];
   baseModelData: BaseModelDataConfig;
   cardView: CardViewConfig;
 };
 
-export function ListCardModelComponent<TModel>({
+export function ListCardComponent<TModel>({
   items,
   baseModelData,
   cardView,
-}: ListCardModelComponentProps<TModel>) {
+}: ListCardComponentProps<TModel>) {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
       {items.map((item: any) => {
@@ -35,7 +35,7 @@ export function ListCardModelComponent<TModel>({
         const image = cardView.cardImage ? resolvePath(item, cardView.cardImage) : undefined;
 
         return (
-          <Card key={id ?? crypto.randomUUID()} withBorder radius="md" p="md" h="100%">
+          <Card key={id} withBorder radius="md" p="md" h="100%">
             {image && (
               <Card.Section>
                 <ImageLoader src={String(image)} alt={String(title)} height={160} radius={0} />
@@ -50,13 +50,19 @@ export function ListCardModelComponent<TModel>({
               <Group gap="xs" mb="sm">
                 {cardView.cardProperties.map((p, idx) => (
                   <Tooltip
+                    key={idx}
                     label={p.label}
                     withArrow
                     multiline
-                    color={p.color ? p.color : "blue"}
+                    color={p.color ?? "blue"}
                   >
-                    <Badge key={idx} variant="light" radius="sm" color={p.color ? p.color : "blue"}>
-                        {formatValue(resolvePath(item, p.value), p.measurement)}
+                    <Badge
+                      key={idx}
+                      variant="light"
+                      radius="sm"
+                      color={p.color ?? "blue"}
+                    >
+                      {formatValue(resolvePath(item, p.value), p.measurement)}
                     </Badge>
                   </Tooltip>
                 ))}
@@ -64,17 +70,24 @@ export function ListCardModelComponent<TModel>({
             ) : null}
 
             {description ? (
-              <Text size="sm" c="dimmed" mb="sm">
+              <Box mb="sm">
+                <Text size="sm" c="dimmed" mb={4}>
+                  Description
+                </Text>
+
                 <Spoiler maxHeight={60} showLabel="Show more" hideLabel="Hide">
-                  {String(description)}
+                  <Text size="sm" c="dimmed">
+                    {String(description)}
+                  </Text>
                 </Spoiler>
-              </Text>
+              </Box>
             ) : null}
 
             {cardView.cardSubProperties?.length ? (
               <Group gap="xs" mb="md">
                 {cardView.cardSubProperties.map((p, idx) => (
                   <Tooltip
+                    key={idx}
                     label={p.label}
                     withArrow
                     multiline

@@ -78,7 +78,7 @@ export const trackConfig = {
               sliderDefault: [0, 100000],
               sliderMarks: [
                 { value: 0, label: "0" },
-                { value: 20000, label: "10k" },
+                { value: 20000, label: "20k" },
                 { value: 40000, label: "40k" },
                 { value: 60000, label: "60k" },
                 { value: 80000, label: "80k" },
@@ -89,7 +89,6 @@ export const trackConfig = {
         },
       ],
     },
-
     rightBar: {
       cardView: {
         cardTitle: ["name"],
@@ -119,7 +118,6 @@ export const trackConfig = {
             color: "blue",
           },
         ],
-
         cardSubProperties: [
           {
             label: "Average Speed",
@@ -141,7 +139,6 @@ export const trackConfig = {
           },
         ],
       },
-
       tableView: {
         tableColumns: [
           { label: "Name", value: ["name"], Flex: 1 },

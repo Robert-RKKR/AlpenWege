@@ -1,21 +1,20 @@
-// TableListModelComponent.tsx
-import { Table } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import { formatValue, resolvePath } from "./listTypes";
-
+// Imports:
 import type { BaseModelDataConfig, TableViewConfig } from "./listTypes";
+import { formatValue, resolvePath } from "./listTypes";
+import { useNavigate } from "react-router-dom";
+import { Table } from "@mantine/core";
 
-type TableListModelComponentProps<TModel> = {
+type ListTableComponentProps<TModel> = {
   items: TModel[];
   baseModelData: BaseModelDataConfig;
   tableView: TableViewConfig;
 };
 
-export function TableListModelComponent<TModel>({
+export function ListTableComponent<TModel>({
   items,
   baseModelData,
   tableView,
-}: TableListModelComponentProps<TModel>) {
+}: ListTableComponentProps<TModel>) {
   const navigate = useNavigate();
 
   return (

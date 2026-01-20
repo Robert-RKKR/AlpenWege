@@ -1,7 +1,7 @@
 // TrackListPage.tsx
 
 // Import application components:
-import { ListModelComponent } from "../../../components/objects/list/ListModelComponent";
+import { ListModelComponent } from "../../../components/models/list/ListModelComponent";
 import type { TrackRelationModel } from "../models/trackModel";
 
 // Config:

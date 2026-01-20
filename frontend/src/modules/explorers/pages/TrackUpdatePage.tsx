@@ -1,5 +1,5 @@
 // Application imports:
-import { ObjectUpdateComponent } from "../../../components/objects/update/UpdateComponent";
+import { ObjectUpdateComponent } from "../../../components/models/update/UpdateComponent";
 import type { TrackDetailedModel } from "../models/trackModel";
 
 // Configuration for trackEditConfig to display TrackRelationModel:
