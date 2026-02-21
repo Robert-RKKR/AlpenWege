@@ -198,3 +198,11 @@ This document outlines the selected technology stack for the AlpenWege project, 
   <img src="project/img/model_page.png" alt="Model page" width="300">
   <img src="project/img/login_page.png" alt="Login page" width="300">
 </p>
+
+# DEV
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+celery -A alpenwegs worker -Q process_model_tasks --hostname=process_model_tasks@%h -l INFO
+sudo npm run dev -- --host 0.0.0.0 --port 8010
+```

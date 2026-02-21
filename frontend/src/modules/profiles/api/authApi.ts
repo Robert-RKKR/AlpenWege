@@ -21,6 +21,21 @@ export type LogoutPayload = {
   refresh: string;
 };
 
+export type RegisterPayload = {
+  username: string;
+  email: string;
+  password1: string;
+  password2: string;
+  first_name: string;
+  last_name: string;
+};
+
+export type RegisterResponse = {
+  access: string;
+  refresh: string;
+  user: AuthUser;
+};
+
 // Login function:
 export async function login(
   payload: LoginPayload
@@ -34,6 +49,18 @@ export async function logout(
   refresh: string
 ): Promise<void> {
   await apiClient.post("/api/auth/logout/", { refresh });
+}
+
+// Register function:
+export async function register(
+  payload: RegisterPayload
+): Promise<RegisterResponse> {
+  const response = await apiClient.post(
+    "/api/auth/registration/",
+    payload
+  );
+
+  return response.data.page_results;
 }
 
 // Refresh token function:

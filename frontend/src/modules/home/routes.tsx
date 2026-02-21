@@ -4,7 +4,7 @@ import { HomePage } from "./pages/HomePage";
 // React imports:
 import { Routes, Route } from "react-router-dom";
 
-// HomeRoutes component:
+// Main Home router component:
 export function HomeRoutes() {
   return (
     <Routes>

@@ -271,7 +271,6 @@ class UserModel(
         self.password_to_change = False
         super().set_password(raw_password)
 
-
     #=================================================================
     # Object calculations:
     #=================================================================

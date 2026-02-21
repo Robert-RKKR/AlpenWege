@@ -5,6 +5,8 @@ from rest_framework import serializers
 # AlpenWegs application imports:
 from profiles.models.user_model import UserModel
 
+# Django import:
+from django.contrib.auth.models import Group
 
 
 # User registration serializer class:
@@ -65,6 +67,10 @@ class UserRegisterSerializer(
         user.first_name = self.validated_data.get('first_name', '')
         user.last_name = self.validated_data.get('last_name', '')
         user.save(update_fields=['first_name', 'last_name'])
+
+        # Assign user to Members group:
+        members_group, _ = Group.objects.get_or_create(name="Member")
+        user.groups.add(members_group)
 
         # Return user:
         return user

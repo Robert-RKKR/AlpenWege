@@ -6,7 +6,7 @@ import { TrackListPage } from "./pages/TrackListPage";
 // React imports:
 import { Routes, Route } from "react-router-dom";
 
-// ExplorerRoutes component:
+// Main Explorer router component:
 export function ExplorerRoutes() {
   return (
     <Routes>
