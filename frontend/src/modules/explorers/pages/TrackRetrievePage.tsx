@@ -27,41 +27,51 @@ export const trackRetrieveConfig = {
       key: "total_distance",
       label: "Distance",
       value: ["total_distance"],
-      suffix: " m",
+      suffix: "Km",
+      transform: {
+        op: "divide",
+        by: 1000,
+        decimals: 2
+      },
     },
     {
       key: "elevation_gain",
       label: "Elevation gain",
       value: ["elevation_gain"],
-      suffix: " m",
+      suffix: "m",
     },
     {
       key: "total_time",
       label: "Total time",
       value: ["total_time"],
-      suffix: " s",
+      suffix: "h",
+      transform: {
+        op: "divide",
+        by: 3600,
+        decimals: 2
+      },
     },
     {
       key: "average_speed",
       label: "Avg speed",
       value: ["average_speed"],
-      suffix: " km/h",
+      suffix: "km/h",
     },
     {
       key: "maximum_speed",
       label: "Max speed",
       value: ["maximum_speed"],
-      suffix: " km/h",
+      suffix: "km/h",
     },
     {
       key: "highest_elevation",
       label: "Highest point",
       value: ["highest_elevation"],
-      suffix: " m",
+      suffix: "m",
     },
   ],
   chapters: [
-    /* ---------------- Distance & Elevation ---------------- */
+    /* Distance & Elevation */
     {
       title: "Distance & Elevation",
       properties: [
@@ -69,48 +79,53 @@ export const trackRetrieveConfig = {
           key: "total_distance",
           label: "Total distance",
           value: ["total_distance"],
-          suffix: " m",
+          suffix: "Km",
+          transform: {
+            op: "divide",
+            by: 1000,
+            decimals: 2
+          },
         },
         {
           key: "elevation_gain",
           label: "Elevation gain",
           value: ["elevation_gain"],
-          suffix: " m",
+          suffix: "m",
         },
         {
           key: "elevation_loss",
           label: "Elevation loss",
           value: ["elevation_loss"],
-          suffix: " m",
+          suffix: "m",
         },
         {
           key: "highest_elevation",
           label: "Highest elevation",
           value: ["highest_elevation"],
-          suffix: " m",
+          suffix: "m",
         },
         {
           key: "lowest_elevation",
           label: "Lowest elevation",
           value: ["lowest_elevation"],
-          suffix: " m",
+          suffix: "m",
         },
         {
           key: "average_grade",
           label: "Average grade",
           value: ["average_grade"],
-          suffix: " %",
+          suffix: "%",
         },
         {
           key: "highest_grade",
           label: "Max grade",
           value: ["highest_grade"],
-          suffix: " %",
+          suffix: "%",
         },
       ],
     },
 
-    /* ---------------- Speed & Pace ---------------- */
+    /* Speed & Pace */
     {
       title: "Speed & Pace",
       properties: [
@@ -118,42 +133,42 @@ export const trackRetrieveConfig = {
           key: "average_speed",
           label: "Average speed",
           value: ["average_speed"],
-          suffix: " km/h",
+          suffix: "km/h",
         },
         {
           key: "maximum_speed",
           label: "Maximum speed",
           value: ["maximum_speed"],
-          suffix: " km/h",
+          suffix: "km/h",
         },
         {
           key: "ascent_avg_speed",
           label: "Ascent avg speed",
           value: ["ascent_average_speed"],
-          suffix: " km/h",
+          suffix: "km/h",
         },
         {
           key: "descent_avg_speed",
           label: "Descent avg speed",
           value: ["descent_average_speed"],
-          suffix: " km/h",
+          suffix: "km/h",
         },
         {
           key: "pace_average",
           label: "Average pace",
           value: ["pace_average"],
-          suffix: " min/km",
+          suffix: "min/km",
         },
         {
           key: "pace_best",
           label: "Best pace",
           value: ["pace_best"],
-          suffix: " min/km",
+          suffix: "min/km",
         },
       ],
     },
 
-    /* ---------------- Time ---------------- */
+    /* Time */
     {
       title: "Time",
       properties: [
@@ -171,18 +186,28 @@ export const trackRetrieveConfig = {
           key: "moving_time",
           label: "Moving time",
           value: ["moving_time"],
-          suffix: " s",
+          suffix: "h",
+          transform: {
+            op: "divide",
+            by: 3600,
+            decimals: 2
+          },
         },
         {
           key: "total_time",
           label: "Total time",
           value: ["total_time"],
-          suffix: " s",
+          suffix: "h",
+          transform: {
+            op: "divide",
+            by: 3600,
+            decimals: 2
+          },
         },
       ],
     },
 
-    /* ---------------- Conditions & Context ---------------- */
+    /* Conditions & Context */
     {
       title: "Conditions & Context",
       properties: [
@@ -195,7 +220,7 @@ export const trackRetrieveConfig = {
           key: "temperature",
           label: "Average temperature",
           value: ["temperature_average"],
-          suffix: " °C",
+          suffix: "°C",
         },
         {
           key: "equipment",
@@ -210,7 +235,7 @@ export const trackRetrieveConfig = {
       ],
     },
 
-    /* ---------------- Safety & Flags ---------------- */
+    /* Safety & Flags */
     {
       title: "Safety & Flags",
       properties: [
@@ -237,7 +262,7 @@ export const trackRetrieveConfig = {
       ],
     },
 
-    /* ---------------- Meta ---------------- */
+    /* Meta */
     {
       title: "Meta",
       properties: [

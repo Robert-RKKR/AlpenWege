@@ -106,13 +106,18 @@ export const trackConfig = {
           {
             label: "Total Distance",
             value: ["total_distance"],
-            measurement: "m",
+            suffix: "Km",
+            transform: {
+              op: "divide",
+              by: 1000,
+              decimals: 2
+            },
             color: "blue",
           },
           {
             label: "Elevation Gain",
             value: ["elevation_gain"],
-            measurement: "m",
+            suffix: "m",
             color: "blue",
           },
         ],
@@ -120,19 +125,24 @@ export const trackConfig = {
           {
             label: "Average Speed",
             value: ["average_speed"],
-            measurement: "km/h",
+            suffix: "km/h",
             color: "gray",
           },
           {
             label: "Maximum Speed",
             value: ["maximum_speed"],
-            measurement: "km/h",
+            suffix: "km/h",
             color: "gray",
           },
           {
             label: "Activity Time",
             value: ["total_time"],
-            measurement: "sec",
+            suffix: "h",
+            transform: {
+              op: "divide",
+              by: 3600,
+              decimals: 2
+            },
             color: "gray",
           },
         ],

@@ -1,35 +1,94 @@
-// listTypes.ts
+// Import types and utility functions for list components:
 import type { TablerIcon } from "@tabler/icons-react";
 
+// Utility to resolve nested paths in objects and format values with optional measurement units:
 export type Path = string[];
 
+// Formats a property value based on optional transformation and measurement configuration:
 export function resolvePath(obj: any, path?: Path) {
   if (!path) return undefined;
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 
-export function formatValue(value: unknown, measurement?: string) {
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "number" && measurement) return `${value} ${measurement}`;
-  if (measurement) return `${String(value)} ${measurement}`;
-  return String(value);
+// Formats a value with optional prefix, suffix, and measurement unit. Handles numeric transformations if specified:
+function toNumberOrNull(v: unknown): number | null {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
 }
 
+export function formatValue(
+  raw: unknown,
+  config?: {
+    prefix?: string;
+    suffix?: string;
+    transform?: ValueTransform;
+  },
+) {
+  if (raw === null || raw === undefined || raw === "") return "—";
+
+  const n = toNumberOrNull(raw);
+
+  if (config?.transform) {
+    if (n === null) return config.transform.fallback ?? "—";
+
+    const { op, by, decimals } = config.transform;
+
+    const computed =
+      op === "divide"
+        ? (by === 0 ? NaN : n / by)
+        : n * by;
+
+    if (!Number.isFinite(computed))
+      return config.transform.fallback ?? "—";
+
+    const formatted =
+      typeof decimals === "number"
+        ? computed.toFixed(decimals)
+        : String(computed);
+
+    return `${config.prefix ?? ""}${formatted}${
+      config.suffix ? ` ${config.suffix}` : ""
+    }`;
+  }
+
+  const base = n !== null ? String(n) : String(raw);
+
+  return `${config?.prefix ?? ""}${base}${
+    config?.suffix ? ` ${config.suffix}` : ""
+  }`;
+}
+
+// Types for list components:
 export type SearchItemType = "text" | "integer" | "date" | "boolean" | "range" | "select";
 
+// Select option type for dropdown filters:
 export type SelectOption = { value: string; label: string };
+
+// Configuration types for list components, including search bar, card view, and table view:
+
+export type ValueTransform = {
+  op: "multiply" | "divide";
+  by: number;
+  decimals?: number;
+  fallback?: string;
+};
+
 
 export type SearchItemConfig =
   | {
       itemLabel: string;
-      itemValue: string; // e.g. "name__icontains"
+      itemValue: string;
       itemType: "text";
       itemDescription?: string;
       itemPlaceholder?: string;
     }
   | {
       itemLabel: string;
-      itemValue: string; // e.g. "elevation_gain"
+      itemValue: string;
       itemType: "integer";
       itemDescription?: string;
       itemPlaceholder?: string;
@@ -38,20 +97,20 @@ export type SearchItemConfig =
     }
   | {
       itemLabel: string;
-      itemValue: string; // e.g. "start_date"
+      itemValue: string;
       itemType: "date";
       itemDescription?: string;
       itemPlaceholder?: string;
     }
   | {
       itemLabel: string;
-      itemValue: string; // e.g. "is_public"
+      itemValue: string;
       itemType: "boolean";
       itemDescription?: string;
     }
   | {
       itemLabel: string;
-      itemValue: [string, string]; // e.g. ["total_distance__gt","total_distance__lt"]
+      itemValue: [string, string];
       itemType: "range";
       itemDescription?: string;
       itemUi?: "slider" | "inputs";
@@ -72,7 +131,7 @@ export type SearchItemConfig =
     }
   | {
       itemLabel: string;
-      itemValue: string; // e.g. "category"
+      itemValue: string;
       itemType: "select";
       itemDescription?: string;
       options: SelectOption[];
@@ -89,7 +148,9 @@ export type SearchBarConfig = {
 export type CardPropertyConfig = {
   label: string;
   value: Path;
-  measurement?: string;
+  prefix?: string;
+  suffix?: string;
+  transform?: ValueTransform;
   color?: string;
 };
 
@@ -106,7 +167,9 @@ export type TableColumnConfig = {
   label: string;
   value: Path;
   flex?: number;
-  measurement?: string;
+  prefix?: string;
+  suffix?: string;
+  transform?: ValueTransform;
   color?: string;
 };
 
@@ -128,20 +191,22 @@ export type ListPageContentConfig = {
   };
 };
 
+// Types for list components, including API response format:
 export type BaseModelDataConfig = {
-  value: string;     // "track"
-  label: string;     // "Track"
-  plural: string;    // "Tracks"
-  href: string;      // "/explorer/track/"
-  id: string;        // "pk"
+  value: string;
+  label: string;
+  plural: string;
+  href: string;
+  id: string;
 };
 
+// Overall configuration type for list components, combining base model data and page content configuration:
 export type ModelListConfig = {
   baseModelData: BaseModelDataConfig;
   listPageContent: ListPageContentConfig;
 };
 
-// API response (align to your existing backend contract)
+// API response (align to your existing backend contract):
 export type ApiListResponse<T> = {
   page_results: T[];
   page_count: number;

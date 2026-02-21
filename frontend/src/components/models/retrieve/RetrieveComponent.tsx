@@ -6,6 +6,10 @@ import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "@mantine/hooks";
 import { Carousel } from "@mantine/carousel";
+import type {
+  ObjectRetrieveConfig,
+  ValueTransform,
+} from "./retrieveTypes";
 import {
   Paper,
   Tabs,
@@ -17,92 +21,47 @@ import {
   Modal,
 } from "@mantine/core";
 
-/**
- * Helper function
- *
- * Safely resolves deeply nested object values
- * using an array-based path definition
- */
+/** Helper function */
 function resolvePath(obj: any, path?: string[]) {
   if (!path) return undefined;
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 
-/**
- * Configuration schema for the retrieve view
- */
-type ObjectRetrieveConfig = {
-  api: {
-    listUrl: string;
-  };
-  routes: {
-    edit: string;
-  };
-  title: {
-    key: string;
-    label?: string;
-    value: string[];
-  };
-  image?: {
-    key: string;
-    label?: string;
-    value: string[];
-  };
-  properties?: {
-    key: string;
-    label: string;
-    value: string[];
-    suffix?: string;
-  }[];
-  chapters?: {
-    title: string;
-    properties: {
-      key: string;
-      label: string;
-      value: string[];
-      suffix?: string;
-    }[];
-  }[];
-};
-
 type Props<T> = {
   config: ObjectRetrieveConfig;
 };
 
-/**
- * ObjectRetrieveComponent
- *
- * Generic retrieve view capable of rendering
- * any object based on configuration
- */
+/** Generic retrieve view capable of rendering any object based on configuration */
 export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
+  // Responsive breakpoint:
   const isMobile = useMediaQuery("(max-width: 48em)");
 
+  // Extract object ID from URL params:
   const { id } = useParams<{ id: string }>();
   const [activeChapter, setActiveChapter] = useState<string | null>("0");
 
-  // Modal state for fullscreen image preview
+  // Modal state for fullscreen image preview:
   const [opened, setOpened] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
+  // Data fetching using React Query:
   const { data, isLoading, error } = useQuery<T>({
     queryKey: [config.api.listUrl, id],
     queryFn: () => BaseApi.retrieve<T>(`${config.api.listUrl}${id}/`),
     enabled: !!id,
   });
 
+  // State for active image in the modal (name and snippet for display in modal title):
   const [activeImageName, setActiveImageName] = useState<string | null>(null);
   const [activeImageSnippet, setActiveImageSnippet] = useState<string | null>(null);
 
+  // Resolve title and images using the provided configuration and fetched data:
   const resolvedTitle =
     data && config.title ? resolvePath(data, config.title.value) : undefined;
-
   const resolvedImages =
     data && config.image ? resolvePath(data, config.image.value) : undefined;
 
-  /**
-   * Responsive layout abstraction
-   */
+  /** Responsive layout abstraction */
   const ResponsiveLayout = ({
     mobile,
     children,
@@ -118,6 +77,56 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
       </Group>
     );
   };
+
+  // Helper function to convert a value to a number or null:
+  function toNumberOrNull(v: unknown): number | null {
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+    if (typeof v === "string") {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+    return null;
+  }
+
+  // Helper function to format property values with optional transforms and suffixes:
+  function formatPropertyValue(
+    raw: unknown,
+    p: { prefix?: string; suffix?: string; transform?: ValueTransform },
+  ): string {
+    // null/undefined -> empty string (keep your current behavior):
+    if (raw === null || raw === undefined) return "";
+
+    // If it is numeric (or numeric string), apply transforms + formatting:
+    const n = toNumberOrNull(raw);
+
+    if (p.transform) {
+      // If transform is defined, require numeric input:
+      if (n === null) return p.transform.fallback ?? "";
+
+      const { op, by, decimals } = p.transform;
+
+      // Guard against divide by 0:
+      const computed =
+        op === "divide"
+          ? (by === 0 ? NaN : n / by)
+          : n * by;
+
+      if (!Number.isFinite(computed)) return p.transform.fallback ?? "";
+
+      const formatted =
+        typeof decimals === "number"
+          ? computed.toFixed(decimals)
+          : String(computed);
+
+      return `${p.prefix ?? ""}${formatted}${p.suffix ? ` ${p.suffix}` : ""}`;
+    }
+
+    // No transform:
+    // - numeric stays numeric
+    // - everything else becomes string
+    const base = n !== null ? String(n) : String(raw);
+    return `${p.prefix ?? ""}${base}${p.suffix ? ` ${p.suffix}` : ""}`;
+  }
 
   return (
     <Stack className="object-retrieve" gap="md" mt="md" mb="md">
@@ -243,9 +252,7 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
                               </Table.Td>
                               <Table.Td>
                                 <Text size="sm">
-                                  {`${resolvePath(data, p.value) ?? ""}${
-                                    p.suffix ?? ""
-                                  }`}
+                                  {formatPropertyValue(resolvePath(data, p.value), p)}
                                 </Text>
                               </Table.Td>
                             </Table.Tr>
@@ -268,7 +275,7 @@ export function ObjectRetrieveComponent<T>({ config }: Props<T>) {
                     <Group key={i} justify="space-between">
                       <Text fw={500}>{p.label}</Text>
                       <Text>
-                        {`${resolvePath(data, p.value) ?? ""}${p.suffix ?? ""}`}
+                        {formatPropertyValue(resolvePath(data, p.value), p)}
                       </Text>
                     </Group>
                   ))}

@@ -1,26 +1,26 @@
-// ListCardModelComponent.tsx
+// Import necessary components:
 import { Badge, Button, Card, Group, SimpleGrid, Spoiler, Text, Tooltip, Box } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 import { formatValue, resolvePath } from "./listTypes";
-
-// If you have your own ImageLoader, keep it.
-// Replace import path as needed.
 import { ImageLoader } from "../../elements/imageLoader/ImageLoader";
-
 import type { CardViewConfig, BaseModelDataConfig } from "./listTypes";
 
+// Component props type definition for ListCardComponent, parameterized by the model type TModel:
 type ListCardComponentProps<TModel> = {
   items: TModel[];
   baseModelData: BaseModelDataConfig;
   cardView: CardViewConfig;
 };
 
+// Renders a grid of cards based on the provided items and configuration.
+// Each card displays an image, title, description, properties, and a link to the detail page.
 export function ListCardComponent<TModel>({
   items,
   baseModelData,
   cardView,
 }: ListCardComponentProps<TModel>) {
+  
   return (
     <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
       {items.map((item: any) => {
@@ -62,7 +62,7 @@ export function ListCardComponent<TModel>({
                       radius="sm"
                       color={p.color ?? "blue"}
                     >
-                      {formatValue(resolvePath(item, p.value), p.measurement)}
+                      {formatValue(resolvePath(item, p.value), p)}
                     </Badge>
                   </Tooltip>
                 ))}
@@ -94,7 +94,7 @@ export function ListCardComponent<TModel>({
                     color={p.color ? p.color : "blue"}
                   >
                     <Badge key={idx} variant="light" radius="sm" color={p.color ? p.color : "blue"}>
-                        {formatValue(resolvePath(item, p.value), p.measurement)}
+                        {formatValue(resolvePath(item, p.value), p)}
                     </Badge>
                   </Tooltip>
                 ))}
