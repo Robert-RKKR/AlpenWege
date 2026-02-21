@@ -41,7 +41,7 @@ export const planningMenu = {
     description: "Plan your next alpine adventure with flexible routes and smart preparation tools.",
     button: {
       label: "Open planner",
-      to: "/explorer",
+      to: "/explorer/unknown",
     },
   },
 };

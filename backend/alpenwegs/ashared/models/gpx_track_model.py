@@ -137,7 +137,7 @@ class BaseGpxTrackModel(
     )
     maximum_speed = models.FloatField(
         verbose_name='Maximum Speed (km/h)',
-        help_text='Highest travelling speed recorded during the activity. '
+        help_text='Highest traveling speed recorded during the activity. '
             'This value identifies the fastest moment captured.',
         blank=True,
         null=True,

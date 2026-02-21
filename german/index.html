@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Template Image Generator</title>
+<style>
+  :root{
+    --brand:#00afaa;
+    --brand2:#008f8c;
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#dcdfe4;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+    --radius:12px;
+  }
+
+  * { box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+
+  header{
+    background:var(--brand);
+    color:#fff;
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  header h2{
+    margin:0;
+    font-size:18px;
+    letter-spacing:.2px;
+  }
+
+  .container{
+    display:flex;
+    gap:16px;
+    padding:16px;
+    align-items:flex-start;
+  }
+
+  .sidebar{
+    width:360px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:14px;
+  }
+
+  .section{
+    border:1px solid #eef0f3;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+    background:#fff;
+  }
+
+  .section h3{
+    margin:0 0 10px 0;
+    font-size:14px;
+    letter-spacing:.2px;
+  }
+
+  .hint{
+    margin:6px 0 0 0;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+  }
+  .row > *{ flex:1; }
+
+  input, select, textarea{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:9px 10px;
+    font-size:13px;
+    background:#fcfcfc;
+    color:var(--text);
+    outline:none;
+  }
+  textarea{ min-height:84px; resize:vertical; }
+
+  .btn{
+    width:100%;
+    border:0;
+    border-radius:10px;
+    padding:10px 12px;
+    cursor:pointer;
+    color:#fff;
+    background:var(--brand);
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .btn:hover{ background:var(--brand2); }
+
+  .btn.secondary{ background:#6b7280; }
+  .btn.secondary:hover{ background:#556070; }
+
+  .btn.danger{ background:#e24b4b; }
+  .btn.danger:hover{ background:#c83d3d; }
+
+  .btn.blue{ background:#3b82f6; }
+  .btn.blue:hover{ background:#2563eb; }
+
+  .btn.small{
+    padding:9px 10px;
+    font-weight:700;
+  }
+
+  .tiny{
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  .panel{
+    border-top:1px solid #eef0f3;
+    margin-top:12px;
+    padding-top:12px;
+  }
+
+  .kbd{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:12px;
+    background:#f3f4f6;
+    border:1px solid #e5e7eb;
+    padding:2px 6px;
+    border-radius:8px;
+    color:#111827;
+  }
+
+  /* Canvas area */
+  #canvasWrapper{
+    flex:1;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid #eef0f3;
+    overflow:auto;
+    padding:12px;
+    min-height:620px;
+  }
+
+  #viewport{
+    transform-origin: top left;
+    position:relative;
+    display:inline-block;
+  }
+
+  #canvas{
+    position:relative;
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    border:2px dashed #cfd6dd;
+    border-radius:12px;
+  }
+
+  .placeholder{
+    position:absolute;
+    border:2px solid var(--brand);
+    resize:both;
+    overflow:hidden;
+    cursor:move;
+
+    /* unlimited sizing */
+    min-width:0;
+    min-height:0;
+    max-width:none;
+    max-height:none;
+
+    background:rgba(255,255,255,0.50);
+    border-radius:10px;
+  }
+  .placeholder.selected{
+    outline:3px solid rgba(0,175,170,.25);
+  }
+
+  /* ✅ FIX: column flex so justify-content becomes VERTICAL */
+  .ph-text{
+    width:100%;
+    height:100%;
+    padding:8px;
+
+    display:flex;
+    flex-direction:column;  /* ✅ IMPORTANT */
+    align-items:stretch;    /* keep inner full width */
+
+    overflow:hidden;
+    user-select:none;
+  }
+
+  .ph-text-inner{
+    width:100%;
+    white-space:pre-wrap;
+    word-break:break-word;
+    overflow:hidden;
+  }
+
+  .ph-img-canvas{
+    width:100%;
+    height:100%;
+    display:block;
+    pointer-events:none;
+  }
+
+  .field{
+    margin-bottom:10px;
+  }
+  .field label{
+    display:block;
+    font-size:12px;
+    color:#374151;
+    margin-bottom:5px;
+  }
+</style>
+</head>
+
+<body>
+<header><h2>Template Image Generator</h2></header>
+
+<div class="container">
+  <div class="sidebar">
+
+    <div class="section">
+      <h3>1) Background</h3>
+      <input type="file" id="bgUpload" accept="image/*" />
+      <div class="hint">
+        The canvas will match the uploaded image size (best alignment for export).
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2) Placeholders</h3>
+      <div class="row">
+        <button class="btn small" id="btnAddText">Add Text</button>
+        <button class="btn small" id="btnAddImage">Add Image</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn danger small" id="btnDelete">Delete</button>
+        <button class="btn blue small" id="btnDuplicate">Duplicate</button>
+      </div>
+      <div class="hint">
+        Shortcuts: <span class="kbd">Ctrl/Cmd+C</span>, <span class="kbd">Ctrl/Cmd+V</span>, <span class="kbd">Delete</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3) Template (Download / Load)</h3>
+      <div class="row">
+        <button class="btn small" id="btnSave">Download Template</button>
+        <button class="btn small" id="btnLoad">Load Template</button>
+      </div>
+      <div class="hint">
+        Downloads a <b>.json</b> template (layout + styles + background). Filled text/images are not saved in the template.
+      </div>
+      <input type="file" id="templateFileInput" accept="application/json" style="display:none" />
+    </div>
+
+    <div class="section">
+      <h3>4) Working Area Zoom</h3>
+      <div class="row">
+        <button class="btn small" id="zoomOut">−</button>
+        <button class="btn secondary small" id="zoomReset">Reset</button>
+        <button class="btn small" id="zoomIn">+</button>
+      </div>
+      <input id="zoomSlider" type="range" min="0.25" max="3" step="0.05" value="1" />
+      <div class="tiny">Zoom: <span id="zoomLabel">100%</span> (export is not scaled)</div>
+    </div>
+
+    <div class="section">
+      <h3>5) Fill & Export</h3>
+      <button class="btn" id="btnFill">Open Fill Data</button>
+      <button class="btn" id="btnExport" style="margin-top:10px">Export PNG</button>
+      <div class="hint">You can also edit selected text content directly in the “Selected” panel.</div>
+    </div>
+
+    <div id="settingsPanel" class="panel"></div>
+    <div id="dataPanel" class="panel"></div>
+  </div>
+
+  <div id="canvasWrapper">
+    <div id="viewport">
+      <div id="canvas"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =========================================================
+  // Core State
+  // =========================================================
+  const canvas = document.getElementById("canvas");
+  const viewport = document.getElementById("viewport");
+  const canvasWrapper = document.getElementById("canvasWrapper");
+  const settingsPanel = document.getElementById("settingsPanel");
+  const dataPanel = document.getElementById("dataPanel");
+
+  let templateData = {
+    background: null,
+    canvasWidth: 900,
+    canvasHeight: 650,
+    placeholders: []
+  };
+
+  let selectedId = null;
+  let viewZoom = 1.0;
+  let phClipboard = null;
+
+  // =========================================================
+  // Utilities
+  // =========================================================
+  function uid() {
+    return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+  }
+
+  function deepClone(obj) {
+    if (typeof structuredClone === "function") return structuredClone(obj);
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function getModel(id) {
+    return templateData.placeholders.find(p => p.id === id) || null;
+  }
+
+  function isFormElementFocused() {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = (el.tagName || "").toUpperCase();
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+  }
+
+  function toHexColor(c) {
+    if (!c) return "#000000";
+    if (typeof c === "string" && c.startsWith("#")) return c;
+    return "#000000";
+  }
+
+  function setCanvasSize(w, h) {
+    templateData.canvasWidth = w;
+    templateData.canvasHeight = h;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+  }
+
+  function selectPlaceholder(id) {
+    selectedId = id;
+    document.querySelectorAll(".placeholder").forEach(p => {
+      p.classList.toggle("selected", p.dataset.id === id);
+    });
+    renderSettingsPanel();
+  }
+
+  // =========================================================
+  // Zoom (working area only)
+  // =========================================================
+  const zoomSlider = document.getElementById("zoomSlider");
+  const zoomLabel = document.getElementById("zoomLabel");
+
+  function setViewZoom(z) {
+    viewZoom = Math.max(0.25, Math.min(3, z));
+    viewport.style.transform = `scale(${viewZoom})`;
+    zoomSlider.value = String(viewZoom);
+    zoomLabel.textContent = `${Math.round(viewZoom * 100)}%`;
+  }
+
+  document.getElementById("zoomIn").addEventListener("click", () => setViewZoom(viewZoom + 0.1));
+  document.getElementById("zoomOut").addEventListener("click", () => setViewZoom(viewZoom - 0.1));
+  document.getElementById("zoomReset").addEventListener("click", () => setViewZoom(1.0));
+  zoomSlider.addEventListener("input", () => setViewZoom(parseFloat(zoomSlider.value)));
+
+  canvasWrapper.addEventListener("wheel", (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.06 : 0.06;
+    setViewZoom(viewZoom + delta);
+  }, { passive: false });
+
+  setViewZoom(1.0);
+
+  // =========================================================
+  // Background upload (canvas matches image size)
+  // =========================================================
+  document.getElementById("bgUpload").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const dataUrl = await fileToDataUrl(file);
+    templateData.background = dataUrl;
+
+    try {
+      const img = await loadImage(dataUrl);
+      setCanvasSize(img.width, img.height);
+    } catch {}
+
+    canvas.style.backgroundImage = `url(${templateData.background})`;
+  });
+
+  // =========================================================
+  // Add placeholders
+  // =========================================================
+  document.getElementById("btnAddText").addEventListener("click", () => addPlaceholder("text"));
+  document.getElementById("btnAddImage").addEventListener("click", () => addPlaceholder("image"));
+
+  function addPlaceholder(type) {
+    const id = uid();
+
+    const model = {
+      id,
+      type,
+      x: 50,
+      y: 50,
+      w: type === "image" ? 140 : 260,
+      h: type === "image" ? 140 : 110
+    };
+
+    if (type === "text") {
+      model.textStyle = {
+        color: "#111111",
+        fontSize: 20,
+        fontFamily: "Arial",
+        letterSpacing: 0,
+        lineHeight: 1.25,
+        shadowEnabled: false,
+        shadowColor: "rgba(0,0,0,0.35)",
+        shadowBlur: 6,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        alignH: "left",     // left | center | right
+        alignV: "top"       // top | middle | bottom
+      };
+      model._textValue = "Text";
+    } else {
+      model.fitMode = "cover";
+      model.zoom = 1.0;
+      model.panX = 0.0;
+      model.panY = 0.0;
+      model._imageDataUrl = null;
+      model._imgObj = null;
+    }
+
+    templateData.placeholders.push(model);
+    renderPlaceholder(model);
+    selectPlaceholder(id);
+  }
+
+  // =========================================================
+  // Render placeholders
+  // =========================================================
+  function renderPlaceholder(model) {
+    const el = document.createElement("div");
+    el.className = "placeholder";
+    el.dataset.id = model.id;
+
+    el.style.left = model.x + "px";
+    el.style.top = model.y + "px";
+    el.style.width = model.w + "px";
+    el.style.height = model.h + "px";
+
+    if (model.type === "text") {
+      const t = document.createElement("div");
+      t.className = "ph-text";
+
+      const inner = document.createElement("div");
+      inner.className = "ph-text-inner";
+      inner.textContent = model._textValue || "Text";
+
+      applyTextStylesToElement(model, t, inner);
+
+      t.appendChild(inner);
+      el.appendChild(t);
+    } else {
+      const cv = document.createElement("canvas");
+      cv.className = "ph-img-canvas";
+      el.appendChild(cv);
+      updateImagePreview(model);
+    }
+
+    el.addEventListener("mousedown", (ev) => {
+      // allow native resize if near bottom-right handle
+      const rect = el.getBoundingClientRect();
+      const nearRight = (rect.right - ev.clientX) < 14;
+      const nearBottom = (rect.bottom - ev.clientY) < 14;
+      if (nearRight && nearBottom) return;
+
+      selectPlaceholder(model.id);
+      startDrag(ev, el);
+    });
+
+    el.addEventListener("click", () => selectPlaceholder(model.id));
+    canvas.appendChild(el);
+
+    const ro = new ResizeObserver(() => syncElementToModel(el));
+    ro.observe(el);
+  }
+
+  // =========================================================
+  // Dragging (zoom-safe)
+  // =========================================================
+  function startDrag(ev, el) {
+    ev.preventDefault();
+
+    const startX = ev.clientX;
+    const startY = ev.clientY;
+
+    const origLeft = parseFloat(el.style.left) || 0;
+    const origTop = parseFloat(el.style.top) || 0;
+
+    function onMove(e) {
+      const dx = (e.clientX - startX) / viewZoom;
+      const dy = (e.clientY - startY) / viewZoom;
+
+      el.style.left = Math.max(0, origLeft + dx) + "px";
+      el.style.top = Math.max(0, origTop + dy) + "px";
+
+      syncElementToModel(el);
+    }
+
+    function onUp() {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
+
+  function syncElementToModel(el) {
+    const id = el.dataset.id;
+    const model = getModel(id);
+    if (!model) return;
+
+    model.x = parseInt(el.style.left, 10) || 0;
+    model.y = parseInt(el.style.top, 10) || 0;
+    model.w = parseInt(el.style.width, 10) || el.offsetWidth;
+    model.h = parseInt(el.style.height, 10) || el.offsetHeight;
+
+    if (model.type === "image") updateImagePreview(model);
+  }
+
+  // =========================================================
+  // Delete / Duplicate
+  // =========================================================
+  document.getElementById("btnDelete").addEventListener("click", deleteSelected);
+  document.getElementById("btnDuplicate").addEventListener("click", duplicateSelected);
+
+  function deleteSelected() {
+    if (!selectedId) return;
+    templateData.placeholders = templateData.placeholders.filter(p => p.id !== selectedId);
+    const el = canvas.querySelector(`.placeholder[data-id="${selectedId}"]`);
+    if (el) el.remove();
+    selectedId = null;
+    settingsPanel.innerHTML = "";
+    dataPanel.innerHTML = "";
+  }
+
+  async function duplicateSelected() {
+    if (!selectedId) return;
+    const src = getModel(selectedId);
+    if (!src) return;
+
+    const copy = deepClone(src);
+    copy.id = uid();
+    copy.x = (Number(copy.x) || 0) + 14;
+    copy.y = (Number(copy.y) || 0) + 14;
+
+    if (copy.type === "image") {
+      copy._imgObj = null;
+      if (copy._imageDataUrl) {
+        try { copy._imgObj = await loadImage(copy._imageDataUrl); } catch { copy._imgObj = null; }
+      }
+    }
+
+    templateData.placeholders.push(copy);
+    renderPlaceholder(copy);
+    selectPlaceholder(copy.id);
+  }
+
+  // =========================================================
+  // Keyboard: copy/paste/delete (placeholder-level)
+  // =========================================================
+  document.addEventListener("keydown", async (e) => {
+    const cmd = e.metaKey || e.ctrlKey;
+
+    if (isFormElementFocused()) return;
+
+    if (cmd && e.key.toLowerCase() === "c") {
+      if (!selectedId) return;
+      const ph = getModel(selectedId);
+      if (!ph) return;
+
+      const copy = deepClone(ph);
+      if (ph.type === "text") copy._textValue = getCurrentTextValue(ph);
+
+      phClipboard = copy;
+      e.preventDefault();
+    }
+
+    if (cmd && e.key.toLowerCase() === "v") {
+      if (!phClipboard) return;
+
+      const paste = deepClone(phClipboard);
+      paste.id = uid();
+      paste.x = (Number(paste.x) || 0) + 14;
+      paste.y = (Number(paste.y) || 0) + 14;
+
+      if (paste.type === "image") {
+        paste._imgObj = null;
+        if (paste._imageDataUrl) {
+          try { paste._imgObj = await loadImage(paste._imageDataUrl); } catch { paste._imgObj = null; }
+        }
+      }
+
+      templateData.placeholders.push(paste);
+      renderPlaceholder(paste);
+      selectPlaceholder(paste.id);
+      e.preventDefault();
+    }
+
+    if (e.key === "Delete" || e.key === "Backspace") {
+      if (!selectedId) return;
+      deleteSelected();
+      e.preventDefault();
+    }
+  });
+
+  // =========================================================
+  // Text: apply styles (DOM preview) including alignment
+  // =========================================================
+  function applyTextStylesToElement(ph, outerEl, innerEl) {
+    const s = ph.textStyle;
+
+    // inner text styles
+    innerEl.style.color = s.color;
+    innerEl.style.fontSize = s.fontSize + "px";
+    innerEl.style.fontFamily = s.fontFamily;
+    innerEl.style.letterSpacing = s.letterSpacing + "px";
+    innerEl.style.lineHeight = String(s.lineHeight);
+    innerEl.style.textShadow = s.shadowEnabled
+      ? `${s.shadowOffsetX}px ${s.shadowOffsetY}px ${s.shadowBlur}px ${s.shadowColor}`
+      : "none";
+
+    // ✅ Horizontal alignment
+    innerEl.style.textAlign = s.alignH || "left";
+
+    // ✅ Vertical alignment (works because .ph-text is column flex)
+    const v = s.alignV || "top";
+    if (v === "top") outerEl.style.justifyContent = "flex-start";
+    else if (v === "middle") outerEl.style.justifyContent = "center";
+    else outerEl.style.justifyContent = "flex-end";
+  }
+
+  // =========================================================
+  // Selected panel: text & image controls
+  // =========================================================
+  function renderSettingsPanel() {
+    const ph = selectedId ? getModel(selectedId) : null;
+
+    if (!ph) {
+      settingsPanel.innerHTML = `
+        <div class="section">
+          <h3>Selected</h3>
+          <div class="tiny">Select a placeholder to edit its settings.</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (ph.type === "image") {
+      settingsPanel.innerHTML = `
+        <div class="section">
+          <h3>Selected Image</h3>
+
+          <div class="field">
+            <label>Upload / Replace Image</label>
+            <input type="file" id="sel_img_upload" accept="image/*" />
+          </div>
+
+          <div class="field">
+            <label>Fit mode</label>
+            <select id="s_fit">
+              <option value="cover">cover (crop to fill)</option>
+              <option value="contain">contain (no crop)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Zoom (${ph.zoom.toFixed(2)})</label>
+            <input id="s_zoom" type="range" min="0.5" max="3" step="0.01" value="${ph.zoom}">
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Pan X (${ph.panX.toFixed(2)})</label>
+              <input id="s_panx" type="range" min="-1" max="1" step="0.01" value="${ph.panX}">
+            </div>
+            <div class="field">
+              <label>Pan Y (${ph.panY.toFixed(2)})</label>
+              <input id="s_pany" type="range" min="-1" max="1" step="0.01" value="${ph.panY}">
+            </div>
+          </div>
+
+          <button class="btn secondary" id="s_reset">Reset Image Controls</button>
+          <div class="hint">These settings affect export. Working-area zoom is separate.</div>
+        </div>
+      `;
+
+      const fit = settingsPanel.querySelector("#s_fit");
+      const zoom = settingsPanel.querySelector("#s_zoom");
+      const panx = settingsPanel.querySelector("#s_panx");
+      const pany = settingsPanel.querySelector("#s_pany");
+      const reset = settingsPanel.querySelector("#s_reset");
+      const upload = settingsPanel.querySelector("#sel_img_upload");
+
+      fit.value = ph.fitMode;
+
+      fit.addEventListener("change", () => { ph.fitMode = fit.value; updateImagePreview(ph); });
+      zoom.addEventListener("input", () => { ph.zoom = parseFloat(zoom.value); renderSettingsPanel(); updateImagePreview(ph); });
+      panx.addEventListener("input", () => { ph.panX = parseFloat(panx.value); renderSettingsPanel(); updateImagePreview(ph); });
+      pany.addEventListener("input", () => { ph.panY = parseFloat(pany.value); renderSettingsPanel(); updateImagePreview(ph); });
+
+      reset.addEventListener("click", () => {
+        ph.fitMode = "cover";
+        ph.zoom = 1.0;
+        ph.panX = 0.0;
+        ph.panY = 0.0;
+        renderSettingsPanel();
+        updateImagePreview(ph);
+      });
+
+      upload.addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const dataUrl = await fileToDataUrl(file);
+        ph._imageDataUrl = dataUrl;
+        try { ph._imgObj = await loadImage(dataUrl); } catch { ph._imgObj = null; }
+        updateImagePreview(ph);
+      });
+
+      return;
+    }
+
+    // TEXT
+    const s = ph.textStyle;
+    if (!s.alignH) s.alignH = "left";
+    if (!s.alignV) s.alignV = "top";
+
+    settingsPanel.innerHTML = `
+      <div class="section">
+        <h3>Selected Text</h3>
+
+        <div class="field">
+          <label>Text content</label>
+          <textarea id="sel_text_value" placeholder="Type text here (multi-line supported)"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Horizontal align</label>
+            <select id="t_align_h">
+              <option value="left">left</option>
+              <option value="center">center</option>
+              <option value="right">right</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Vertical align</label>
+            <select id="t_align_v">
+              <option value="top">top</option>
+              <option value="middle">middle</option>
+              <option value="bottom">bottom</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Color</label>
+            <input id="t_color" type="color" value="${toHexColor(s.color)}">
+          </div>
+          <div class="field">
+            <label>Font size</label>
+            <input id="t_size" type="number" min="1" max="500" value="${s.fontSize}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Font family</label>
+          <select id="t_family">
+            <option value="Arial">Arial</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Letter spacing (px)</label>
+            <input id="t_ls" type="number" step="0.5" min="-50" max="200" value="${s.letterSpacing}">
+          </div>
+          <div class="field">
+            <label>Line height</label>
+            <input id="t_lh" type="number" step="0.05" min="0.1" max="10" value="${s.lineHeight}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label><input id="t_shadow_on" type="checkbox" ${s.shadowEnabled ? "checked" : ""}> Enable shadow</label>
+        </div>
+
+        <div id="shadowBox" style="${s.shadowEnabled ? "" : "display:none"}">
+          <div class="row">
+            <div class="field">
+              <label>Shadow color</label>
+              <input id="t_shadow_color" type="color" value="${toHexColor(s.shadowColor)}">
+            </div>
+            <div class="field">
+              <label>Blur</label>
+              <input id="t_shadow_blur" type="number" min="0" max="200" value="${s.shadowBlur}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Offset X</label>
+              <input id="t_shadow_x" type="number" min="-500" max="500" value="${s.shadowOffsetX}">
+            </div>
+            <div class="field">
+              <label>Offset Y</label>
+              <input id="t_shadow_y" type="number" min="-500" max="500" value="${s.shadowOffsetY}">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const content = settingsPanel.querySelector("#sel_text_value");
+    const alignH = settingsPanel.querySelector("#t_align_h");
+    const alignV = settingsPanel.querySelector("#t_align_v");
+
+    content.value = getCurrentTextValue(ph);
+    alignH.value = s.alignH;
+    alignV.value = s.alignV;
+
+    settingsPanel.querySelector("#t_family").value = s.fontFamily;
+
+    const updateTextDom = () => {
+      const outer = canvas.querySelector(`.placeholder[data-id="${ph.id}"] .ph-text`);
+      const inner = canvas.querySelector(`.placeholder[data-id="${ph.id}"] .ph-text-inner`);
+      if (!outer || !inner) return;
+
+      inner.textContent = ph._textValue || "Text";
+      applyTextStylesToElement(ph, outer, inner);
+
+      const ta = document.getElementById(`data_${ph.id}`);
+      if (ta && ta.tagName === "TEXTAREA") ta.value = ph._textValue || "";
+    };
+
+    content.addEventListener("input", () => {
+      ph._textValue = content.value || "";
+      updateTextDom();
+    });
+
+    alignH.addEventListener("change", () => {
+      s.alignH = alignH.value;
+      updateTextDom();
+    });
+
+    alignV.addEventListener("change", () => {
+      s.alignV = alignV.value;
+      updateTextDom();
+    });
+
+    settingsPanel.querySelector("#t_color").addEventListener("input", (e) => { s.color = e.target.value; updateTextDom(); });
+    settingsPanel.querySelector("#t_size").addEventListener("input", (e) => { s.fontSize = parseFloat(e.target.value || "20"); updateTextDom(); });
+    settingsPanel.querySelector("#t_family").addEventListener("change", (e) => { s.fontFamily = e.target.value; updateTextDom(); });
+    settingsPanel.querySelector("#t_ls").addEventListener("input", (e) => { s.letterSpacing = parseFloat(e.target.value || "0"); updateTextDom(); });
+    settingsPanel.querySelector("#t_lh").addEventListener("input", (e) => { s.lineHeight = parseFloat(e.target.value || "1.25"); updateTextDom(); });
+
+    settingsPanel.querySelector("#t_shadow_on").addEventListener("change", (e) => {
+      s.shadowEnabled = e.target.checked;
+      settingsPanel.querySelector("#shadowBox").style.display = s.shadowEnabled ? "" : "none";
+      updateTextDom();
+    });
+
+    settingsPanel.querySelector("#t_shadow_color")?.addEventListener("input", (e) => { s.shadowColor = e.target.value; updateTextDom(); });
+    settingsPanel.querySelector("#t_shadow_blur")?.addEventListener("input", (e) => { s.shadowBlur = parseFloat(e.target.value || "0"); updateTextDom(); });
+    settingsPanel.querySelector("#t_shadow_x")?.addEventListener("input", (e) => { s.shadowOffsetX = parseFloat(e.target.value || "0"); updateTextDom(); });
+    settingsPanel.querySelector("#t_shadow_y")?.addEventListener("input", (e) => { s.shadowOffsetY = parseFloat(e.target.value || "0"); updateTextDom(); });
+  }
+
+  // =========================================================
+  // Template: Download / Load (file)
+  // =========================================================
+  document.getElementById("btnSave").addEventListener("click", downloadTemplate);
+  document.getElementById("btnLoad").addEventListener("click", () => {
+    document.getElementById("templateFileInput").click();
+  });
+
+  document.getElementById("templateFileInput").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      await loadTemplateFromObject(parsed);
+      alert("Template loaded.");
+    } catch {
+      alert("Invalid template file.");
+    } finally {
+      e.target.value = "";
+    }
+  });
+
+  function downloadTemplate() {
+    document.querySelectorAll(".placeholder").forEach(syncElementToModel);
+
+    const safe = deepClone(templateData);
+    safe.placeholders.forEach(ph => {
+      delete ph._textValue;
+      delete ph._imageDataUrl;
+      delete ph._imgObj;
+    });
+
+    const blob = new Blob([JSON.stringify(safe, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const ts = new Date().toISOString().replace(/[:.]/g, "-");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `template-${ts}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  async function loadTemplateFromObject(obj) {
+    templateData = obj;
+
+    templateData.canvasWidth = Number(templateData.canvasWidth) || 900;
+    templateData.canvasHeight = Number(templateData.canvasHeight) || 650;
+    templateData.placeholders = Array.isArray(templateData.placeholders) ? templateData.placeholders : [];
+
+    templateData.placeholders.forEach(ph => {
+      ph.x = Number(ph.x) || 0;
+      ph.y = Number(ph.y) || 0;
+      ph.w = Number(ph.w) || 120;
+      ph.h = Number(ph.h) || 60;
+
+      if (ph.type === "text") {
+        ph._textValue = "Text";
+        ph.textStyle = ph.textStyle || {};
+        if (!ph.textStyle.alignH) ph.textStyle.alignH = "left";
+        if (!ph.textStyle.alignV) ph.textStyle.alignV = "top";
+      } else {
+        ph._imageDataUrl = null;
+        ph._imgObj = null;
+        ph.fitMode = ph.fitMode || "cover";
+        ph.zoom = Number(ph.zoom) || 1.0;
+        ph.panX = Number(ph.panX) || 0.0;
+        ph.panY = Number(ph.panY) || 0.0;
+      }
+    });
+
+    setCanvasSize(templateData.canvasWidth, templateData.canvasHeight);
+
+    canvas.innerHTML = "";
+    canvas.style.backgroundImage = templateData.background ? `url(${templateData.background})` : "none";
+    templateData.placeholders.forEach(renderPlaceholder);
+
+    selectedId = null;
+    renderSettingsPanel();
+    dataPanel.innerHTML = "";
+  }
+
+  // =========================================================
+  // Fill Data panel
+  // =========================================================
+  document.getElementById("btnFill").addEventListener("click", () => {
+    dataPanel.innerHTML = `
+      <div class="section">
+        <h3>Fill Data</h3>
+        <div class="tiny">Bulk editing. Selected panel is recommended for styling/alignment.</div>
+      </div>
+    `;
+
+    const wrapAll = document.createElement("div");
+    wrapAll.className = "section";
+
+    templateData.placeholders.forEach((ph, idx) => {
+      const field = document.createElement("div");
+      field.className = "field";
+
+      const label = document.createElement("label");
+      label.textContent = `${idx + 1}. ${ph.type.toUpperCase()} (${ph.id.slice(0, 6)})`;
+      field.appendChild(label);
+
+      if (ph.type === "text") {
+        const ta = document.createElement("textarea");
+        ta.id = `data_${ph.id}`;
+        ta.value = getCurrentTextValue(ph);
+        ta.placeholder = "Enter text (multi-line supported)...";
+        ta.addEventListener("input", () => {
+          ph._textValue = ta.value || "";
+          const inner = canvas.querySelector(`.placeholder[data-id="${ph.id}"] .ph-text-inner`);
+          if (inner) inner.textContent = ph._textValue || "Text";
+        });
+        field.appendChild(ta);
+      } else {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.id = `data_${ph.id}`;
+
+        input.addEventListener("change", async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const dataUrl = await fileToDataUrl(file);
+          ph._imageDataUrl = dataUrl;
+          try { ph._imgObj = await loadImage(dataUrl); } catch { ph._imgObj = null; }
+          updateImagePreview(ph);
+          if (selectedId === ph.id) renderSettingsPanel();
+        });
+
+        field.appendChild(input);
+
+        const hint = document.createElement("div");
+        hint.className = "hint";
+        hint.textContent = "Select the image placeholder to adjust zoom/pan/fit.";
+        field.appendChild(hint);
+      }
+
+      wrapAll.appendChild(field);
+    });
+
+    dataPanel.appendChild(wrapAll);
+  });
+
+  // =========================================================
+  // Image helpers
+  // =========================================================
+  async function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function drawImageToRect(ctx, img, x, y, w, h, fitMode, zoom, panX, panY) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+
+    const rectAR = w / h;
+    const imgAR = img.width / img.height;
+
+    if (fitMode === "cover") {
+      let sw, sh;
+      if (imgAR > rectAR) {
+        sh = img.height;
+        sw = sh * rectAR;
+      } else {
+        sw = img.width;
+        sh = sw / rectAR;
+      }
+
+      sw = sw / zoom;
+      sh = sh / zoom;
+
+      const maxPanX = (img.width - sw) / 2;
+      const maxPanY = (img.height - sh) / 2;
+
+      const sx = (img.width - sw) / 2 + panX * maxPanX;
+      const sy = (img.height - sh) / 2 + panY * maxPanY;
+
+      ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+    } else {
+      const r = Math.min(w / img.width, h / img.height) * zoom;
+      const dw = img.width * r;
+      const dh = img.height * r;
+
+      const maxPanDx = Math.max(0, (dw - w) / 2);
+      const maxPanDy = Math.max(0, (dh - h) / 2);
+
+      const dx = x + (w - dw) / 2 - panX * maxPanDx;
+      const dy = y + (h - dh) / 2 - panY * maxPanDy;
+
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    ctx.restore();
+  }
+
+  function updateImagePreview(ph) {
+    const phEl = canvas.querySelector(`.placeholder[data-id="${ph.id}"]`);
+    if (!phEl) return;
+
+    const cv = phEl.querySelector("canvas.ph-img-canvas");
+    if (!cv) return;
+
+    const w = Math.max(1, ph.w);
+    const h = Math.max(1, ph.h);
+
+    cv.width = w;
+    cv.height = h;
+
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, w, h);
+
+    if (ph._imgObj) {
+      drawImageToRect(ctx, ph._imgObj, 0, 0, w, h, ph.fitMode, ph.zoom, ph.panX, ph.panY);
+    } else {
+      ctx.fillStyle = "rgba(0,175,170,0.08)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#00afaa";
+      ctx.font = "14px Arial";
+      ctx.fillText("Image", 10, 10);
+    }
+  }
+
+  // =========================================================
+  // Text export helpers with alignment
+  // =========================================================
+  function getCurrentTextValue(ph) {
+    if (typeof ph._textValue === "string" && ph._textValue.length) return ph._textValue;
+
+    const ta = document.getElementById(`data_${ph.id}`);
+    if (ta && typeof ta.value === "string" && ta.value.length) return ta.value;
+
+    const el = canvas.querySelector(`.placeholder[data-id="${ph.id}"] .ph-text-inner`);
+    if (el && typeof el.textContent === "string" && el.textContent.length) return el.textContent;
+
+    return "";
+  }
+
+  function wrapText(ctx, text, maxWidth) {
+    const lines = [];
+    const paragraphs = String(text || "").split("\n");
+
+    for (const para of paragraphs) {
+      if (para.trim() === "") { lines.push(""); continue; }
+
+      const words = para.split(/\s+/);
+      let line = "";
+
+      for (const word of words) {
+        const test = line ? (line + " " + word) : word;
+        if (ctx.measureText(test).width <= maxWidth) line = test;
+        else {
+          if (line) lines.push(line);
+          line = word;
+        }
+      }
+      if (line) lines.push(line);
+    }
+    return lines;
+  }
+
+  function measureLineWidth(ctx, line, letterSpacingPx) {
+    const base = ctx.measureText(line).width;
+    if (!letterSpacingPx) return base;
+    const extra = Math.max(0, line.length - 1) * letterSpacingPx;
+    return base + extra;
+  }
+
+  function drawLineWithLetterSpacing(ctx, line, x, y, letterSpacingPx) {
+    if (!letterSpacingPx) {
+      ctx.fillText(line, x, y);
+      return;
+    }
+    let cursor = x;
+    for (const ch of line) {
+      ctx.fillText(ch, cursor, y);
+      cursor += ctx.measureText(ch).width + letterSpacingPx;
+    }
+  }
+
+  function drawTextBlock(ctx, text, ph) {
+    const s = ph.textStyle;
+    const padding = 8;
+    const maxW = Math.max(0, ph.w - padding * 2);
+    const maxH = Math.max(0, ph.h - padding * 2);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(ph.x, ph.y, ph.w, ph.h);
+    ctx.clip();
+
+    ctx.fillStyle = s.color;
+    ctx.font = `${s.fontSize}px ${s.fontFamily}`;
+    ctx.textBaseline = "top";
+
+    if (s.shadowEnabled) {
+      ctx.shadowColor = s.shadowColor;
+      ctx.shadowBlur = s.shadowBlur;
+      ctx.shadowOffsetX = s.shadowOffsetX;
+      ctx.shadowOffsetY = s.shadowOffsetY;
+    } else {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    const linesAll = wrapText(ctx, text, maxW);
+
+    const linePx = s.fontSize * s.lineHeight;
+    const maxLines = linePx > 0 ? Math.floor(maxH / linePx) : 0;
+    const lines = maxLines > 0 ? linesAll.slice(0, maxLines) : [];
+
+    const totalTextH = lines.length * linePx;
+
+    // Vertical alignment
+    let yStart = ph.y + padding;
+    if (s.alignV === "middle") yStart = ph.y + padding + (maxH - totalTextH) / 2;
+    else if (s.alignV === "bottom") yStart = ph.y + padding + (maxH - totalTextH);
+
+    let y = yStart;
+
+    for (const line of lines) {
+      const lw = measureLineWidth(ctx, line, s.letterSpacing);
+
+      // Horizontal alignment
+      let x = ph.x + padding;
+      if (s.alignH === "center") x = ph.x + padding + (maxW - lw) / 2;
+      else if (s.alignH === "right") x = ph.x + padding + (maxW - lw);
+
+      // ✅ clamp: do not shift past left padding if line is longer than box
+      x = Math.max(ph.x + padding, x);
+
+      drawLineWithLetterSpacing(ctx, line, x, y, s.letterSpacing);
+      y += linePx;
+    }
+
+    ctx.restore();
+  }
+
+  // =========================================================
+  // Export PNG
+  // =========================================================
+  document.getElementById("btnExport").addEventListener("click", exportPNG);
+
+  async function exportPNG() {
+    document.querySelectorAll(".placeholder").forEach(syncElementToModel);
+
+    const W = templateData.canvasWidth || canvas.clientWidth;
+    const H = templateData.canvasHeight || canvas.clientHeight;
+
+    const out = document.createElement("canvas");
+    out.width = W;
+    out.height = H;
+    const ctx = out.getContext("2d");
+
+    if (templateData.background) {
+      const bg = await loadImage(templateData.background);
+      ctx.drawImage(bg, 0, 0, W, H);
+    } else {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    for (const ph of templateData.placeholders) {
+      const x = Number(ph.x) || 0;
+      const y = Number(ph.y) || 0;
+      const w = Math.max(1, Number(ph.w) || 1);
+      const h = Math.max(1, Number(ph.h) || 1);
+
+      ph.x = x; ph.y = y; ph.w = w; ph.h = h;
+
+      if (ph.type === "text") {
+        const text = getCurrentTextValue(ph);
+        drawTextBlock(ctx, text, ph);
+      } else {
+        if (!ph._imgObj && ph._imageDataUrl) {
+          try { ph._imgObj = await loadImage(ph._imageDataUrl); } catch { ph._imgObj = null; }
+        }
+        if (ph._imgObj) {
+          drawImageToRect(ctx, ph._imgObj, x, y, w, h, ph.fitMode, ph.zoom, ph.panX, ph.panY);
+        }
+      }
+    }
+
+    const link = document.createElement("a");
+    link.download = "generated.png";
+    link.href = out.toDataURL("image/png");
+    link.click();
+  }
+
+  // =========================================================
+  // Initial canvas + Selected panel
+  // =========================================================
+  setCanvasSize(templateData.canvasWidth, templateData.canvasHeight);
+  renderSettingsPanel();
+</script>
+</body>
+</html>

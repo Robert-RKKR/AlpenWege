@@ -17,12 +17,13 @@ import {
   Divider,
   Drawer,
   useMantineTheme,
-  HoverCard,
+  Popover,
   ScrollArea,
   UnstyledButton,
   Group,
   Text,
 } from "@mantine/core";
+import { useState } from "react";
 
 // PageHeader component:
 export function PageHeader() {
@@ -50,6 +51,10 @@ export function PageHeader() {
   { /* Mantine theme access for colors and spacing */ }
   const theme = useMantineTheme();
 
+  { /* State control for desktop Popover menu */ }
+  const [planningPopoverOpened, setPlanningPopoverOpened] = useState(false);
+  const [trackingPopoverOpened, setTrackingPopoverOpened] = useState(false);
+
   return (
     <Box>
       { /* Header bar (rendered inside AppShell.Header) */ }
@@ -64,7 +69,7 @@ export function PageHeader() {
             <RobertLogo size={40} color={theme.colors.blue[6]} />
           </UnstyledButton>
 
-          { /* ====== Desktop primary navigation ====== */ }
+          { /* Desktop primary navigation */ }
           <Group h="100%" gap={0} visibleFrom="sm">
 
             {/* Home section (Desktop) */}
@@ -73,52 +78,68 @@ export function PageHeader() {
             </NavLink>
 
             { /* Planning section (Desktop) */ }
-            <HoverCard
+            <Popover
               width={600}
               position="bottom"
               radius="md"
               shadow="md"
               withinPortal
+              opened={planningPopoverOpened}
+              onChange={setPlanningPopoverOpened}
             >
-              <HoverCard.Target>
-                <NavLink to="/plans" className={classes.pageHeaderLink}>
-                  <Center inline>
+              <Popover.Target>
+                <UnstyledButton
+                  className={classes.pageHeaderLink}
+                  onClick={() => setPlanningPopoverOpened((o) => !o)}
+                >
+                  <Center inline mr={10}>
                     <Box component="span" mr={5}>
                       Planning
                     </Box>
                     <IconChevronDown size={16} />
                   </Center>
-                </NavLink>
-              </HoverCard.Target>
+                </UnstyledButton>
+              </Popover.Target>
 
-              <HoverCard.Dropdown style={{ overflow: "hidden" }}>
-                <PageHeaderDropdown config={planningMenu} />
-              </HoverCard.Dropdown>
-            </HoverCard>
+              <Popover.Dropdown style={{ overflow: "hidden" }}>
+                <PageHeaderDropdown
+                  config={planningMenu}
+                  onItemClick={() => setPlanningPopoverOpened(false)}
+                />
+              </Popover.Dropdown>
+            </Popover>
 
             { /* Tracking section (Desktop) */ }
-            <HoverCard
+            <Popover
               width={600}
               position="bottom"
               radius="md"
               shadow="md"
               withinPortal
+              opened={trackingPopoverOpened}
+              onChange={setTrackingPopoverOpened}
             >
-              <HoverCard.Target>
-                <NavLink to="/explorer/track" className={classes.pageHeaderLink}>
+              <Popover.Target>
+                <UnstyledButton
+                  className={classes.pageHeaderLink}
+                  onClick={() => setTrackingPopoverOpened((o) => !o)}
+                >
                   <Center inline>
                     <Box component="span" mr={5}>
                       Tracking
                     </Box>
                     <IconChevronDown size={16} />
                   </Center>
-                </NavLink>
-              </HoverCard.Target>
+                </UnstyledButton>
+              </Popover.Target>
 
-              <HoverCard.Dropdown style={{ overflow: "hidden" }}>
-                <PageHeaderDropdown config={trackingMenu} />
-              </HoverCard.Dropdown>
-            </HoverCard>
+              <Popover.Dropdown style={{ overflow: "hidden" }}>
+                <PageHeaderDropdown
+                  config={trackingMenu}
+                  onItemClick={() => setTrackingPopoverOpened(false)}
+                />
+              </Popover.Dropdown>
+            </Popover>
 
             {/* Compendium section (Desktop) */}
             <NavLink to="/compendium" className={classes.pageHeaderLink}>
@@ -156,7 +177,7 @@ export function PageHeader() {
         </Group>
       </header>
 
-      { /* ====== Mobile navigation drawer ====== */ }
+      { /* Mobile navigation drawer */ }
       <Drawer
         opened={drawerOpened}
         onClose={closeDrawer}
